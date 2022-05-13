@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"jiajiazi.cn","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="编译linux源码作为内核">
+<meta property="og:type" content="article">
+<meta property="og:title" content="编译内核">
+<meta property="og:url" content="http://jiajiazi.cn/2021/10/02/bianyineihe/index.html">
+<meta property="og:site_name" content="FOR LIFE">
+<meta property="og:description" content="编译linux源码作为内核">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-10-01T18:15:17.000Z">
+<meta property="article:modified_time" content="2022-05-13T15:52:51.771Z">
+<meta property="article:author" content="GS &amp; XXJ">
+<meta property="article:tag" content="kernel">
+<meta property="article:tag" content="centos">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://jiajiazi.cn/2021/10/02/bianyineihe/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://jiajiazi.cn/2021/10/02/bianyineihe/","path":"2021/10/02/bianyineihe/","title":"编译内核"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>编译内核 | FOR LIFE</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">FOR LIFE</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%A6%96%E5%85%88%E6%A3%80%E6%9F%A5%E6%98%AF%E5%90%A6%E5%AE%89%E8%A3%85%E4%BA%86%E7%9B%B8%E5%BA%94%E7%9A%84%E8%BD%AF%E4%BB%B6%E5%8C%85"><span class="nav-number">1.</span> <span class="nav-text">首先检查是否安装了相应的软件包</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E8%BD%BD%E6%BA%90%E7%A0%81"><span class="nav-number">2.</span> <span class="nav-text">下载源码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A3%E5%8E%8B%E5%B9%B6%E5%88%9B%E5%BB%BA%E7%AC%A6%E5%8F%B7%E9%93%BE%E6%8E%A5"><span class="nav-number">3.</span> <span class="nav-text">解压并创建符号链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA-config-%E6%96%87%E4%BB%B6"><span class="nav-number">4.</span> <span class="nav-text">创建 .config 文件</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#make"><span class="nav-number">5.</span> <span class="nav-text">make</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C-make-modules-install"><span class="nav-number">6.</span> <span class="nav-text">执行 make modules_install</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A7%E8%A1%8Cmake-install"><span class="nav-number">7.</span> <span class="nav-text">执行make install</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#reboot%E7%84%B6%E5%90%8E%E9%80%89%E6%8B%A9%E6%96%B0%E7%BC%96%E8%AF%91%E5%A5%BD%E7%9A%84linux%E5%86%85%E6%A0%B8"><span class="nav-number">8.</span> <span class="nav-text">reboot然后选择新编译好的linux内核</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8D%B8%E8%BD%BD%E5%86%85%E6%A0%B8"><span class="nav-number">9.</span> <span class="nav-text">卸载内核</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">GS & XXJ</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://jiajiazi.cn/2021/10/02/bianyineihe/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="GS & XXJ">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="FOR LIFE">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="编译内核 | FOR LIFE">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          编译内核
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-10-02 02:15:17" itemprop="dateCreated datePublished" datetime="2021-10-02T02:15:17+08:00">2021-10-02</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-05-13 23:52:51" itemprop="dateModified" datetime="2022-05-13T23:52:51+08:00">2022-05-13</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>编译linux源码作为内核</p>
+<span id="more"></span>
+
+<h2 id="首先检查是否安装了相应的软件包"><a href="#首先检查是否安装了相应的软件包" class="headerlink" title="首先检查是否安装了相应的软件包"></a>首先检查是否安装了相应的软件包</h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ yum group list
+<span class="token comment">#原始输出如下</span>
+Loaded plugins: fastestmirror, langpacks
+There is no installed <span class="token function">groups</span> file.
+Maybe run: yum <span class="token function">groups</span> mark convert <span class="token punctuation">(</span>see <span class="token function">man</span> yum<span class="token punctuation">)</span>
+Loading mirror speeds from cached hostfile
+Available Environment Groups:
+   Minimal Install
+   Compute Node
+   Infrastructure Server
+   File and Print Server
+   Basic Web Server
+   Virtualization Host
+   Server with GUI
+   GNOME Desktop
+   KDE Plasma Workspaces
+   Development and Creative Workstation
+Available Groups:
+   Compatibility Libraries
+   Console Internet Tools
+   Development Tools
+   Graphical Administration Tools
+   Legacy UNIX Compatibility
+   Scientific Support
+   Security Tools
+   Smart Card Support
+   System Administration Tools
+   System Management
+Done
+$ yum <span class="token function">groups</span>  <span class="token function">install</span>  <span class="token string">"Development and Creative Workstation"</span> <span class="token string">"Compatibility Libraries"</span> -y
+<span class="token comment">#这里安装了编译环境的包，并未为了后续编译安装了“Compatibility Libraries”包，需要等蛮久的</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="下载源码"><a href="#下载源码" class="headerlink" title="下载源码"></a>下载源码</h2><p>可以从官网上下载源码：<a target="_blank" rel="noopener" href="https://www.kernel.org/">https://www.kernel.org/</a></p>
+<p>也可以从镜像站下载源码：<a target="_blank" rel="noopener" href="https://mirrors.edge.kernel.org/pub/linux/kernel/">https://mirrors.edge.kernel.org/pub/linux/kernel/</a></p>
+<p>国内直接从镜像站下载还是比较靠谱的。</p>
+<p>这里我下载的是4.9.46版本，因为测试需要用这个版本的内核</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">wget</span> https://mirrors.edge.kernel.org/pub/linux/kernel/v4.x/linux-4.9.46.tar.gz<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h2 id="解压并创建符号链接"><a href="#解压并创建符号链接" class="headerlink" title="解压并创建符号链接"></a>解压并创建符号链接</h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">tar</span> zxf linux-4.9.46.tar.gz
+<span class="token function">ln</span> -sv linux-4.9.46 linux
+<span class="token builtin class-name">cd</span> linux<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>这里符号链接可以理解成windows里面的快捷方式，创建好符号链接之后进到内核源码目录中</p>
+<h2 id="创建-config-文件"><a href="#创建-config-文件" class="headerlink" title="创建 .config 文件"></a>创建 .config 文件</h2><p>这个文件就是选需要加载的内核模块，使用<code>make menuconfig</code>就可以可视化的选择内核模块是否需要加载，但是因为是可视化的，所以就需要<code>ncurses</code>包的支持，然后先安装<code>ncurses</code>包，再执行<code>make menuconfig</code>命令就可以了。如果需要清除以前的配置，可以用<code>make mrproper</code>命令来清除以前的配置。</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">yum <span class="token function">install</span> ncurses ncurses-devel -y
+<span class="token function">make</span> mrproper
+<span class="token function">make</span> menuconfig<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>以上就可以进入内核配置参数的界面。</p>
+<p>在配置的过程中，需要注意的是：</p>
+<ul>
+<li>[*]：编译到内核文件中去，类似<code>vmlinuz-**.el7.x86_64</code>中</li>
+<li>[M]：编译到模块文件中去，类似<code>/lib/modules/***.el7.x86_64/</code>目录中</li>
+</ul>
+<h2 id="make"><a href="#make" class="headerlink" title="make"></a>make</h2><p>然后就可以执行make命令进行编译了</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">make</span>
+<span class="token comment">#出错了，需要安装openssl的包</span>
+$ yum <span class="token function">install</span> -y openssl.x86_64 openssl-devel.x86_64
+
+$ <span class="token function">make</span> clean 
+$ <span class="token function">make</span> -j16<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>如果编译出错了，可以执行<code>make clean</code>命令清楚之前编译出的文件，然后重新执行<code>make</code>命令进行编译。</p>
+<h2 id="执行-make-modules-install"><a href="#执行-make-modules-install" class="headerlink" title="执行 make modules_install"></a>执行 <code>make modules_install</code></h2><h2 id="执行make-install"><a href="#执行make-install" class="headerlink" title="执行make install"></a>执行<code>make install</code></h2><h2 id="reboot然后选择新编译好的linux内核"><a href="#reboot然后选择新编译好的linux内核" class="headerlink" title="reboot然后选择新编译好的linux内核"></a>reboot然后选择新编译好的linux内核</h2><h2 id="卸载内核"><a href="#卸载内核" class="headerlink" title="卸载内核"></a>卸载内核</h2><p>如果要卸载内核：</p>
+<ul>
+<li>删除<code>/lib/modules</code>目录下对应版本的库文件</li>
+<li>删除<code>/usr/src/linux</code>目录下的源码和压缩文件</li>
+<li>删除<code>/boot</code>启动的内核和内核镜像文件</li>
+<li>删除<code>grub.conf</code>配置文件新内核对应的条目</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/kernel/" rel="tag"># kernel</a>
+              <a href="/tags/centos/" rel="tag"># centos</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/09/12/gRPC-C/" rel="prev" title="gRPC-C++">
+                  <i class="fa fa-chevron-left"></i> gRPC-C++
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/10/27/ftrace/" rel="next" title="ftrace">
+                  ftrace <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">GS & XXJ</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"jiajiazi.cn","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="go版本的grpc，go是1.17.1版本">
+<meta property="og:type" content="article">
+<meta property="og:title" content="grpc-go">
+<meta property="og:url" content="http://jiajiazi.cn/2021/09/11/grpc-go/index.html">
+<meta property="og:site_name" content="FOR LIFE">
+<meta property="og:description" content="go版本的grpc，go是1.17.1版本">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-09-11T03:22:45.000Z">
+<meta property="article:modified_time" content="2022-05-13T15:52:51.772Z">
+<meta property="article:author" content="GS &amp; XXJ">
+<meta property="article:tag" content="grpc">
+<meta property="article:tag" content="go">
+<meta property="article:tag" content="go-chan">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://jiajiazi.cn/2021/09/11/grpc-go/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://jiajiazi.cn/2021/09/11/grpc-go/","path":"2021/09/11/grpc-go/","title":"grpc-go"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>grpc-go | FOR LIFE</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">FOR LIFE</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#grpc-Go-version"><span class="nav-number">1.</span> <span class="nav-text">grpc (Go version)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GO"><span class="nav-number">1.1.</span> <span class="nav-text">GO</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#quick-start"><span class="nav-number">1.1.1.</span> <span class="nav-text">quick start</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#test-proto%E6%96%87%E4%BB%B6"><span class="nav-number">1.1.1.0.1.</span> <span class="nav-text">test.proto文件</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#%E7%BC%96%E8%AF%91%EF%BC%8C%E7%94%9F%E6%88%90test-pb-go"><span class="nav-number">1.1.1.0.2.</span> <span class="nav-text">编译，生成test.pb.go</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#client-go"><span class="nav-number">1.1.1.0.3.</span> <span class="nav-text">client.go</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#server-go"><span class="nav-number">1.1.1.0.4.</span> <span class="nav-text">server.go</span></a></li></ol></li></ol></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">GS & XXJ</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://jiajiazi.cn/2021/09/11/grpc-go/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="GS & XXJ">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="FOR LIFE">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="grpc-go | FOR LIFE">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          grpc-go
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-09-11 11:22:45" itemprop="dateCreated datePublished" datetime="2021-09-11T11:22:45+08:00">2021-09-11</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-05-13 23:52:51" itemprop="dateModified" datetime="2022-05-13T23:52:51+08:00">2022-05-13</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>go版本的grpc，<br>go是1.17.1版本</p>
+<span id="more"></span>
+
+<p>先看<a href="www.baidu.com">protobuf</a>的介绍，用一个<code>.proto</code>文件作为服务定义，然后客户端和服务端都用这个文件生成的代码为基础进行编程。</p>
+<h2 id="grpc-Go-version"><a href="#grpc-Go-version" class="headerlink" title="grpc (Go version)"></a>grpc (Go version)</h2><p>先定义服务</p>
+<pre class="line-numbers language-protobuf" data-language="protobuf"><code class="language-protobuf"><span class="token keyword">service</span> <span class="token class-name">HelloService</span> <span class="token punctuation">&#123;</span>
+ <span class="token comment">//一个rpc对应一个远程方法</span>
+ 
+ <span class="token comment">//单个请求单个回复</span>
+ <span class="token keyword">rpc</span> <span class="token function">SayHello</span> <span class="token punctuation">(</span><span class="token class-name">HelloRequest</span><span class="token punctuation">)</span> <span class="token keyword">returns</span> <span class="token punctuation">(</span><span class="token class-name">HelloResponse</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+  
+ <span class="token comment">//单个请求流式回复，服务器流式 RPC</span>
+ <span class="token keyword">rpc</span> <span class="token function">LotsOfReplies</span><span class="token punctuation">(</span><span class="token class-name">HelloRequest</span><span class="token punctuation">)</span> <span class="token keyword">returns</span> <span class="token punctuation">(</span><span class="token keyword">stream</span> <span class="token class-name">HelloResponse</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+ <span class="token comment">//流式请求，单个回复，客户端流式 RPC</span>
+ <span class="token keyword">rpc</span> <span class="token function">LotsOfGreetings</span><span class="token punctuation">(</span><span class="token keyword">stream</span> <span class="token class-name">HelloRequest</span><span class="token punctuation">)</span> <span class="token keyword">returns</span> <span class="token punctuation">(</span><span class="token class-name">HelloResponse</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+ <span class="token comment">//双向流式传输</span>
+ <span class="token keyword">rpc</span> <span class="token function">BidiHello</span><span class="token punctuation">(</span><span class="token keyword">stream</span> <span class="token class-name">HelloRequest</span><span class="token punctuation">)</span> <span class="token keyword">returns</span> <span class="token punctuation">(</span><span class="token keyword">stream</span> <span class="token class-name">HelloResponse</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">message</span> <span class="token class-name">HelloRequest</span> <span class="token punctuation">&#123;</span>
+  <span class="token builtin">string</span> greeting <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">message</span> <span class="token class-name">HelloResponse</span> <span class="token punctuation">&#123;</span>
+  <span class="token builtin">string</span> reply <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="GO"><a href="#GO" class="headerlink" title="GO"></a>GO</h3><h4 id="quick-start"><a href="#quick-start" class="headerlink" title="quick start"></a>quick start</h4><h6 id="test-proto文件"><a href="#test-proto文件" class="headerlink" title="test.proto文件"></a><code>test.proto</code>文件</h6><pre class="line-numbers language-protobuf" data-language="protobuf"><code class="language-protobuf"><span class="token keyword">syntax</span> <span class="token operator">=</span> <span class="token string">"proto3"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">package</span> grpc_test<span class="token punctuation">;</span>
+<span class="token keyword">option</span> go_package<span class="token operator">=</span><span class="token string">"../../grpc_test"</span><span class="token punctuation">;</span>
+<span class="token comment">// The greeting service definition.</span>
+<span class="token comment">// 单请求、回复rpc</span>
+<span class="token keyword">service</span> <span class="token class-name">Greeter</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// Sends a greeting</span>
+  <span class="token keyword">rpc</span> <span class="token function">SayHello</span> <span class="token punctuation">(</span><span class="token class-name">HelloRequest</span><span class="token punctuation">)</span> <span class="token keyword">returns</span> <span class="token punctuation">(</span><span class="token class-name">HelloReply</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+  <span class="token keyword">rpc</span> <span class="token function">SayHelloAll</span> <span class="token punctuation">(</span><span class="token keyword">stream</span> <span class="token class-name">HelloRequest</span><span class="token punctuation">)</span> <span class="token keyword">returns</span> <span class="token punctuation">(</span><span class="token keyword">stream</span> <span class="token class-name">HelloReply</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">// The request message containing the user's name.</span>
+<span class="token keyword">message</span> <span class="token class-name">HelloRequest</span> <span class="token punctuation">&#123;</span>
+  <span class="token builtin">string</span> name <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// The response message containing the greetings</span>
+<span class="token keyword">message</span> <span class="token class-name">HelloReply</span> <span class="token punctuation">&#123;</span>
+  <span class="token builtin">string</span> message <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h6 id="编译，生成test-pb-go"><a href="#编译，生成test-pb-go" class="headerlink" title="编译，生成test.pb.go"></a>编译，生成<code>test.pb.go</code></h6><p>从<code>https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protoc-3.17.3-linux-x86_64.zip</code>下载得到protoc的执行文件，放到GOPATH的bin目录下。</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">wget</span> https://github.com/protocolbuffers/protobuf/releases/download/v3.17.3/protoc-3.17.3-linux-x86_64.zip
+<span class="token comment">#下载protoc Linux64位的可执行文件</span>
+<span class="token function">unzip</span> protoc-3.17.3-linux-x86_64.zip
+<span class="token comment">#解压</span>
+<span class="token function">cp</span> bin/protoc ~/GOPATH/bin/
+<span class="token comment">#放到GOPATH，$GOPATH/bin已经加到$PATH中了</span>
+go get -u github.com/golang/protobuf/protoc-gen-go
+<span class="token comment">#protoc不可以直接编译go，需要protoc-gen-go做支持</span>
+protoc -I <span class="token builtin class-name">.</span> --go_out<span class="token operator">=</span>plugins<span class="token operator">=</span>grpc:. test.proto
+<span class="token comment"># -I是设置源路径，--go_out是使用test.proto中options的路径。</span>
+<span class="token comment">#编译出来`test.pb.go`，编译好之后缺少很多包的支持，需要重新获取依赖</span>
+go mod tidy
+go mod download
+go mod vendor<span class="token comment">#拉取依赖到本地，记得要把vendor放到.gitignore文件中，否则项目太大了，只要把go.mod&amp;go.sum放到git中即可。</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>这样就编译出了<code>test.pb.go</code>文件，之后的grpc编程便可以使用这个文件。</p>
+<h6 id="client-go"><a href="#client-go" class="headerlink" title="client.go"></a><code>client.go</code></h6><p>然后编写client.go和server.go</p>
+<pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">//client.go</span>
+
+<span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+	<span class="token string">"context"</span>
+	<span class="token string">"fmt"</span>
+	<span class="token string">"google.golang.org/grpc"</span>
+	<span class="token string">"grpc_test/pb"</span>
+	<span class="token string">"io"</span>
+	<span class="token string">"log"</span>
+	<span class="token string">"time"</span>
+<span class="token punctuation">)</span>
+<span class="token comment">//address指的就是访问server的ip和端口</span>
+<span class="token keyword">const</span> <span class="token punctuation">(</span>
+	address  <span class="token operator">=</span> <span class="token string">"localhost:4306"</span>
+	name <span class="token operator">=</span> <span class="token string">"helloworld"</span>
+<span class="token punctuation">)</span>
+<span class="token comment">//一次请求一个回复的例子</span>
+<span class="token keyword">func</span> hello_once <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+    <span class="token comment">//grpc.Dial建立一个连接，是一个异步连接</span>
+    <span class="token comment">//grpc.WithInsecure()指这个端口号不需要安全配置</span>
+    <span class="token comment">//grpc.WithBlock()阻塞等待握手成功</span>
+	conn<span class="token punctuation">,</span>err <span class="token operator">:=</span> grpc<span class="token punctuation">.</span><span class="token function">Dial</span><span class="token punctuation">(</span>address<span class="token punctuation">,</span> grpc<span class="token punctuation">.</span><span class="token function">WithInsecure</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> grpc<span class="token punctuation">.</span><span class="token function">WithBlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatalln</span><span class="token punctuation">(</span><span class="token string">"Dial err"</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+    <span class="token comment">//如果是常驻进程并且忘记Close会导致内存泄漏</span>
+	<span class="token keyword">defer</span> conn<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token comment">//用这个连接新建一个客户端</span>
+	c <span class="token operator">:=</span> pb<span class="token punctuation">.</span><span class="token function">NewGreeterClient</span><span class="token punctuation">(</span>conn<span class="token punctuation">)</span>
+    <span class="token comment">//ctx我也不知道有什么用</span>
+	ctx<span class="token punctuation">,</span> cancel <span class="token operator">:=</span> context<span class="token punctuation">.</span><span class="token function">WithTimeout</span><span class="token punctuation">(</span>context<span class="token punctuation">.</span><span class="token function">Background</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> time<span class="token punctuation">.</span>Second<span class="token punctuation">)</span>
+	<span class="token keyword">defer</span> <span class="token function">cancel</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token comment">//请求</span>
+    req <span class="token operator">:=</span> pb<span class="token punctuation">.</span>HelloRequest<span class="token punctuation">&#123;</span>Name<span class="token punctuation">:</span>name<span class="token punctuation">&#125;</span>
+	r<span class="token punctuation">,</span>err <span class="token operator">:=</span> c<span class="token punctuation">.</span><span class="token function">SayHello</span><span class="token punctuation">(</span>ctx<span class="token punctuation">,</span> <span class="token operator">&amp;</span>req<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatalln</span><span class="token punctuation">(</span><span class="token string">"revoke err, %v"</span><span class="token punctuation">,</span>err <span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	log<span class="token punctuation">.</span><span class="token function">Print</span><span class="token punctuation">(</span><span class="token string">"success %s\n"</span><span class="token punctuation">,</span>r<span class="token punctuation">.</span><span class="token function">GetMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> hello_all <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+	conn<span class="token punctuation">,</span>err <span class="token operator">:=</span> grpc<span class="token punctuation">.</span><span class="token function">Dial</span><span class="token punctuation">(</span>address<span class="token punctuation">,</span> grpc<span class="token punctuation">.</span><span class="token function">WithInsecure</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> grpc<span class="token punctuation">.</span><span class="token function">WithBlock</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatalln</span><span class="token punctuation">(</span><span class="token string">"Dial err"</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">defer</span> conn<span class="token punctuation">.</span><span class="token function">Close</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	ctx<span class="token punctuation">,</span> cancel <span class="token operator">:=</span> context<span class="token punctuation">.</span><span class="token function">WithTimeout</span><span class="token punctuation">(</span>context<span class="token punctuation">.</span><span class="token function">Background</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span> time<span class="token punctuation">.</span>Second<span class="token punctuation">)</span>
+	<span class="token keyword">defer</span> <span class="token function">cancel</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	client <span class="token operator">:=</span> pb<span class="token punctuation">.</span><span class="token function">NewGreeterClient</span><span class="token punctuation">(</span>conn<span class="token punctuation">)</span>
+	stream<span class="token punctuation">,</span> err <span class="token operator">:=</span> client<span class="token punctuation">.</span><span class="token function">SayHelloAll</span><span class="token punctuation">(</span>ctx<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatalf</span><span class="token punctuation">(</span><span class="token string">"revoke err, %v"</span><span class="token punctuation">,</span>err <span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	waitc <span class="token operator">:=</span> <span class="token function">make</span><span class="token punctuation">(</span><span class="token keyword">chan</span> <span class="token builtin">string</span><span class="token punctuation">)</span>
+	<span class="token comment">//用一个协程来收服务端发回来的信息。</span>
+    <span class="token keyword">go</span> <span class="token keyword">func</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">for</span> <span class="token punctuation">&#123;</span>
+			get<span class="token punctuation">,</span> err <span class="token operator">:=</span> stream<span class="token punctuation">.</span><span class="token function">Recv</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+            <span class="token comment">//服务端return之后就会发一个EOF，猜测。</span>
+			<span class="token keyword">if</span> err <span class="token operator">==</span> io<span class="token punctuation">.</span>EOF <span class="token punctuation">&#123;</span>
+				<span class="token keyword">return</span>
+			<span class="token punctuation">&#125;</span>
+			<span class="token keyword">if</span> get <span class="token operator">!=</span> <span class="token boolean">nil</span><span class="token punctuation">&#123;</span>
+				waitc <span class="token operator">&lt;-</span> get<span class="token punctuation">.</span><span class="token function">GetMessage</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+				<span class="token comment">//log.Printf("%s\n", get.Message)</span>
+			<span class="token punctuation">&#125;</span>
+		<span class="token punctuation">&#125;</span>
+	<span class="token punctuation">&#125;</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token comment">//给服务端发信息。</span>
+	<span class="token keyword">for</span> i<span class="token operator">:=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span><span class="token number">100</span><span class="token punctuation">;</span>i<span class="token operator">++</span> <span class="token punctuation">&#123;</span>
+		stream<span class="token punctuation">.</span><span class="token function">Send</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>pb<span class="token punctuation">.</span>HelloRequest<span class="token punctuation">&#123;</span>
+			Name<span class="token punctuation">:</span> name<span class="token punctuation">,</span>
+		<span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+    <span class="token comment">//发送完毕，关闭发送，避免服务端一直占用资源。</span>
+	err <span class="token operator">=</span> stream<span class="token punctuation">.</span><span class="token function">CloseSend</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		<span class="token keyword">return</span>
+	<span class="token punctuation">&#125;</span>
+    <span class="token comment">//输出所有服务端发送的消息，其实本质上也是等待服务端处理完所有的消息并返回。</span>
+	<span class="token keyword">for</span>  st <span class="token punctuation">,</span>ok <span class="token operator">:=</span> <span class="token operator">&lt;-</span> waitc<span class="token punctuation">;</span> ok <span class="token punctuation">;</span> st <span class="token operator">=</span> <span class="token operator">&lt;-</span> waitc<span class="token punctuation">&#123;</span>
+		fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"%s"</span><span class="token punctuation">,</span>st<span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> main <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+	<span class="token function">hello_all</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h6 id="server-go"><a href="#server-go" class="headerlink" title="server.go"></a><code>server.go</code></h6><pre class="line-numbers language-go" data-language="go"><code class="language-go"><span class="token comment">//server.go</span>
+<span class="token keyword">package</span> main
+
+<span class="token keyword">import</span> <span class="token punctuation">(</span>
+	<span class="token string">"context"</span>
+	<span class="token string">"fmt"</span>
+	<span class="token string">"google.golang.org/grpc"</span>
+	pb <span class="token string">"grpc_test/pb"</span>
+	<span class="token string">"io"</span>
+	<span class="token string">"log"</span>
+	<span class="token string">"net"</span>
+<span class="token punctuation">)</span>
+
+<span class="token comment">//还可以放点其他的东西在创建server的时候可以初始化本地信息，然后后面执行远程过程调用的时候也可以使用。</span>
+<span class="token keyword">type</span> server <span class="token keyword">struct</span> <span class="token punctuation">&#123;</span>
+	pb<span class="token punctuation">.</span>UnimplementedGreeterServer
+<span class="token punctuation">&#125;</span>
+
+
+<span class="token comment">/**
+SayHello(context.Context, *HelloRequest) (*HelloReply, error)
+SayHelloAll(Greeter_SayHelloAllServer) error
+*/</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s<span class="token operator">*</span> server<span class="token punctuation">)</span> <span class="token function">SayHello</span><span class="token punctuation">(</span>ctx context<span class="token punctuation">.</span>Context<span class="token punctuation">,</span> req <span class="token operator">*</span>pb<span class="token punctuation">.</span>HelloRequest<span class="token punctuation">)</span> <span class="token punctuation">(</span><span class="token operator">*</span>pb<span class="token punctuation">.</span>HelloReply<span class="token punctuation">,</span> <span class="token builtin">error</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+
+	fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"%s req, %s once\n"</span><span class="token punctuation">,</span>req <span class="token punctuation">,</span> req<span class="token punctuation">.</span>Name<span class="token punctuation">)</span>
+	resp <span class="token operator">:=</span> pb<span class="token punctuation">.</span>HelloReply<span class="token punctuation">&#123;</span>
+		Message<span class="token punctuation">:</span> <span class="token string">"adfadf"</span><span class="token punctuation">,</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> <span class="token operator">&amp;</span>resp<span class="token punctuation">,</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token keyword">func</span> <span class="token punctuation">(</span>s <span class="token operator">*</span>server<span class="token punctuation">)</span> <span class="token function">SayHelloAll</span><span class="token punctuation">(</span>req pb<span class="token punctuation">.</span>Greeter_SayHelloAllServer<span class="token punctuation">)</span> <span class="token builtin">error</span> <span class="token punctuation">&#123;</span>
+	<span class="token keyword">for</span> i<span class="token operator">:=</span><span class="token number">0</span><span class="token punctuation">;</span>i<span class="token operator">&lt;</span><span class="token number">10000</span><span class="token punctuation">;</span>i<span class="token operator">++</span> <span class="token punctuation">&#123;</span>
+		t<span class="token punctuation">,</span> err <span class="token operator">:=</span> req<span class="token punctuation">.</span><span class="token function">Recv</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+		<span class="token keyword">if</span> err <span class="token operator">==</span> io<span class="token punctuation">.</span>EOF<span class="token punctuation">&#123;</span>
+			<span class="token keyword">break</span>
+		<span class="token punctuation">&#125;</span>
+		<span class="token keyword">if</span> err <span class="token operator">!=</span> <span class="token boolean">nil</span><span class="token punctuation">&#123;</span>
+			log<span class="token punctuation">.</span><span class="token function">Fatalln</span><span class="token punctuation">(</span><span class="token string">"Recv err"</span><span class="token punctuation">)</span>
+		<span class="token punctuation">&#125;</span>
+		fmt<span class="token punctuation">.</span><span class="token function">Printf</span><span class="token punctuation">(</span><span class="token string">"%s req, %s time %d\n"</span><span class="token punctuation">,</span>t <span class="token punctuation">,</span>t<span class="token punctuation">.</span>Name <span class="token punctuation">,</span> i<span class="token punctuation">)</span>
+		req<span class="token punctuation">.</span><span class="token function">Send</span><span class="token punctuation">(</span><span class="token operator">&amp;</span>pb<span class="token punctuation">.</span>HelloReply<span class="token punctuation">&#123;</span>Message<span class="token punctuation">:</span> fmt<span class="token punctuation">.</span><span class="token function">Sprintf</span><span class="token punctuation">(</span><span class="token string">"reply %v\n"</span><span class="token punctuation">,</span> i<span class="token punctuation">)</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	<span class="token keyword">return</span> <span class="token boolean">nil</span>
+<span class="token punctuation">&#125;</span>
+
+
+<span class="token keyword">func</span> main <span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">&#123;</span>
+	lis<span class="token punctuation">,</span>err  <span class="token operator">:=</span> net<span class="token punctuation">.</span><span class="token function">Listen</span><span class="token punctuation">(</span><span class="token string">"tcp"</span><span class="token punctuation">,</span><span class="token string">"localhost:4306"</span><span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err<span class="token operator">!=</span><span class="token boolean">nil</span><span class="token punctuation">&#123;</span>
+		log<span class="token punctuation">.</span><span class="token function">Fatalln</span><span class="token punctuation">(</span><span class="token string">"listen err"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+	<span class="token punctuation">&#125;</span>
+	s <span class="token operator">:=</span> grpc<span class="token punctuation">.</span><span class="token function">NewServer</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+	pb<span class="token punctuation">.</span><span class="token function">RegisterGreeterServer</span><span class="token punctuation">(</span>s<span class="token punctuation">,</span> <span class="token operator">&amp;</span>server<span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+
+	err<span class="token operator">=</span>s<span class="token punctuation">.</span><span class="token function">Serve</span><span class="token punctuation">(</span>lis<span class="token punctuation">)</span>
+	<span class="token keyword">if</span> err<span class="token operator">!=</span><span class="token boolean">nil</span> <span class="token punctuation">&#123;</span>
+		fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"start err"</span><span class="token punctuation">)</span>
+	<span class="token punctuation">&#125;</span>
+	fmt<span class="token punctuation">.</span><span class="token function">Println</span><span class="token punctuation">(</span><span class="token string">"start"</span><span class="token punctuation">)</span>
+
+
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/grpc/" rel="tag"># grpc</a>
+              <a href="/tags/go/" rel="tag"># go</a>
+              <a href="/tags/go-chan/" rel="tag"># go-chan</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/09/11/protobuf/" rel="prev" title="protobuf">
+                  <i class="fa fa-chevron-left"></i> protobuf
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/09/12/gRPC-C/" rel="next" title="gRPC-C++">
+                  gRPC-C++ <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">GS & XXJ</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"jiajiazi.cn","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Device Mapper 是Linux内核用来将块设备映射到虚拟块设备的framework，现在的一个想法，就是先找到文件在硬盘上的位置，然后用Device Mapper（以后简称dm）映射成一个块设备，之后的读写就可以直接对这个虚拟块设备进行读写，而不用通过文件系统等等的操作。   文章参考：https:&#x2F;&#x2F;www.lijiaocn.com&#x2F;%E6%8A%80%E5%B7%A7&#x2F;2017">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Device Mapper使用基础">
+<meta property="og:url" content="http://jiajiazi.cn/2021/12/09/Device-Mapper%E4%BD%BF%E7%94%A8%E5%9F%BA%E7%A1%80/index.html">
+<meta property="og:site_name" content="FOR LIFE">
+<meta property="og:description" content="Device Mapper 是Linux内核用来将块设备映射到虚拟块设备的framework，现在的一个想法，就是先找到文件在硬盘上的位置，然后用Device Mapper（以后简称dm）映射成一个块设备，之后的读写就可以直接对这个虚拟块设备进行读写，而不用通过文件系统等等的操作。   文章参考：https:&#x2F;&#x2F;www.lijiaocn.com&#x2F;%E6%8A%80%E5%B7%A7&#x2F;2017">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="c:/Users/gaishun/Downloads/IO_stack_of_the_Linux_kernel.svg">
+<meta property="article:published_time" content="2021-12-09T12:57:16.000Z">
+<meta property="article:modified_time" content="2022-05-13T15:52:51.770Z">
+<meta property="article:author" content="GS &amp; XXJ">
+<meta property="article:tag" content="Device Mapper">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="c:/Users/gaishun/Downloads/IO_stack_of_the_Linux_kernel.svg">
+
+
+<link rel="canonical" href="http://jiajiazi.cn/2021/12/09/Device-Mapper%E4%BD%BF%E7%94%A8%E5%9F%BA%E7%A1%80/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://jiajiazi.cn/2021/12/09/Device-Mapper%E4%BD%BF%E7%94%A8%E5%9F%BA%E7%A1%80/","path":"2021/12/09/Device-Mapper使用基础/","title":"Device Mapper使用基础"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Device Mapper使用基础 | FOR LIFE</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">FOR LIFE</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%88%E6%94%BE%E4%B8%80%E5%BC%A0%E9%9D%9E%E5%B8%B8%E7%89%9B%E9%80%BC%E7%9A%84%E5%9B%BE%E6%9D%A5%E9%95%87%E6%A5%BC%E3%80%82"><span class="nav-number">1.</span> <span class="nav-text">先放一张非常牛逼的图来镇楼。</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%99%9A%E6%8B%9F%E5%9D%97table"><span class="nav-number">2.</span> <span class="nav-text">虚拟块table</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E8%99%9A%E6%8B%9F%E5%9D%97%E8%AE%BE%E5%A4%87"><span class="nav-number">3.</span> <span class="nav-text">创建虚拟块设备</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#thin-thin-pool"><span class="nav-number">4.</span> <span class="nav-text">thin, thin-pool</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AAthin-pool"><span class="nav-number">4.1.</span> <span class="nav-text">创建一个thin-pool</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BAthin"><span class="nav-number">4.2.</span> <span class="nav-text">创建thin</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%A0%E9%99%A4thin"><span class="nav-number">4.3.</span> <span class="nav-text">删除thin</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#dm-linear"><span class="nav-number">5.</span> <span class="nav-text">dm-linear</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E4%B8%80%E4%B8%AA%E8%AE%BE%E5%A4%87%EF%BC%9A"><span class="nav-number">5.1.</span> <span class="nav-text">创建一个设备：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%A4%E4%B8%AA%E8%AE%BE%E5%A4%87%E5%90%88%E5%B9%B6%E6%88%90%E4%B8%80%E4%B8%AA%E8%AE%BE%E5%A4%87"><span class="nav-number">5.2.</span> <span class="nav-text">两个设备合并成一个设备</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B0%86%E4%B8%80%E4%B8%AA%E8%AE%BE%E5%A4%87%E5%88%86%E6%88%90%E5%9B%BA%E5%AE%9A%E5%A4%A7%E5%B0%8F%E7%9A%84%E5%9D%97%EF%BC%8C%E7%84%B6%E5%90%8E%E5%8F%8D%E5%90%91%E7%BB%84%E5%90%88"><span class="nav-number">5.3.</span> <span class="nav-text">将一个设备分成固定大小的块，然后反向组合</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">GS & XXJ</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://jiajiazi.cn/2021/12/09/Device-Mapper%E4%BD%BF%E7%94%A8%E5%9F%BA%E7%A1%80/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="GS & XXJ">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="FOR LIFE">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Device Mapper使用基础 | FOR LIFE">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Device Mapper使用基础
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-12-09 20:57:16" itemprop="dateCreated datePublished" datetime="2021-12-09T20:57:16+08:00">2021-12-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-05-13 23:52:51" itemprop="dateModified" datetime="2022-05-13T23:52:51+08:00">2022-05-13</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <blockquote>
+<p>  Device Mapper 是Linux内核用来将块设备映射到虚拟块设备的framework，现在的一个想法，就是先找到文件在硬盘上的位置，然后用Device Mapper（以后简称dm）映射成一个块设备，之后的读写就可以直接对这个虚拟块设备进行读写，而不用通过文件系统等等的操作。</p>
+<p>  文章参考：<a target="_blank" rel="noopener" href="https://www.lijiaocn.com/%E6%8A%80%E5%B7%A7/2017/07/07/linux-tool-devicemapper.html">https://www.lijiaocn.com/%E6%8A%80%E5%B7%A7/2017/07/07/linux-tool-devicemapper.html</a></p>
+</blockquote>
+<span id="more"></span>
+<h2 id="先放一张非常牛逼的图来镇楼。"><a href="#先放一张非常牛逼的图来镇楼。" class="headerlink" title="先放一张非常牛逼的图来镇楼。"></a>先放一张非常牛逼的图来镇楼。</h2><p><img src="C:\Users\gaishun\Downloads\IO_stack_of_the_Linux_kernel.svg" alt="IO_stack_of_the_Linux_kernel"></p>
+<p>使用<code>lvm</code>命令管理逻辑卷的时候，最终是通过dm完成的。</p>
+<p><code>dmsetup</code>命令可以直接管理dm。</p>
+<h2 id="虚拟块table"><a href="#虚拟块table" class="headerlink" title="虚拟块table"></a>虚拟块table</h2><p>通过<code>dmsetup table</code>可以查看虚拟块设备的记录情况，然后格式如下：</p>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">logical_start_sector	num_sectors	target_type	target_args
+分别代表：
+开始扇区				 扇区数		设备类型	设备参数<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>其中设备类型可以去kernel的<code>documents/device-mapper</code>里面去找，大致如下：</p>
+<pre class="line-numbers language-text" data-language="text"><code class="language-text">linear destination_device start_sector
+    The traditional linear mapping.
+striped num_stripes chunk_size [destination start_sector]...
+    Creates a striped area.
+    e.g. striped 2 32 /dev/hda1 0 /dev/hdb1 0 will map the first chunk (16k) as follows:
+    LV chunk 1 -> hda1, chunk 1
+    LV chunk 2 -> hdb1, chunk 1
+    LV chunk 3 -> hda1, chunk 2
+    LV chunk 4 -> hdb1, chunk 2
+error     Errors any I/O that goes to this area.  Useful for testing or for creating devices with holes in them.
+zero      Returns blocks of zeroes on reads.  Any data written is discarded silently.  
+          This is a block-device equivalent of the /dev/zero character-device data sink described in null(4).
+cache     Improves performance of a block device (eg, a spindle) by dynamically migrating some of its data to a faster smaller device (eg, an SSD).
+crypt     Transparent encryption of block devices using the kernel crypto API.
+delay     Delays reads and/or writes to different devices.  Useful for testing.
+flakey    Creates a similar mapping to the linear target but exhibits unreliable behaviour periodically.  
+          Useful for simulating failing devices when testing.
+mirror    Mirrors data across two or more devices.
+multipath
+Mediates  access through multiple paths to the same device.
+raid      Offers an interface to the kernel's software raid driver, md.
+snapshot  Supports  snapshots of devices.
+thin, thin-pool
+    Supports thin provisioning of devices and also provides a better snapshot support.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h2 id="创建虚拟块设备"><a href="#创建虚拟块设备" class="headerlink" title="创建虚拟块设备"></a>创建虚拟块设备</h2><p>使用的是<code>dmsetup create</code>命令进行创建设备。</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">create <span class="token operator">&lt;</span>dev_name<span class="token operator">></span>
+          <span class="token punctuation">[</span>-j<span class="token operator">|</span>--major <span class="token operator">&lt;</span>major<span class="token operator">></span> -m<span class="token operator">|</span>--minor <span class="token operator">&lt;</span>minor<span class="token operator">></span><span class="token punctuation">]</span>
+          <span class="token punctuation">[</span>-U<span class="token operator">|</span>--uid <span class="token operator">&lt;</span>uid<span class="token operator">></span><span class="token punctuation">]</span> <span class="token punctuation">[</span>-G<span class="token operator">|</span>--gid <span class="token operator">&lt;</span>gid<span class="token operator">></span><span class="token punctuation">]</span> <span class="token punctuation">[</span>-M<span class="token operator">|</span>--mode <span class="token operator">&lt;</span>octal_mode<span class="token operator">></span><span class="token punctuation">]</span>
+          <span class="token punctuation">[</span>-u<span class="token operator">|</span>uuid <span class="token operator">&lt;</span>uuid<span class="token operator">></span><span class="token punctuation">]</span> <span class="token punctuation">[</span>--addnodeonresume<span class="token operator">|</span>--addnodeoncreate<span class="token punctuation">]</span>
+          <span class="token punctuation">[</span>--readahead <span class="token punctuation">&#123;</span><span class="token punctuation">[</span>+<span class="token punctuation">]</span><span class="token operator">&lt;</span>sectors<span class="token operator">>|</span>auto<span class="token operator">|</span>none<span class="token punctuation">&#125;</span><span class="token punctuation">]</span>
+          <span class="token punctuation">[</span>-n<span class="token operator">|</span>--notable<span class="token operator">|</span>--table <span class="token punctuation">&#123;</span><span class="token operator">&lt;</span>table<span class="token operator">>|</span><span class="token operator">&lt;</span>table_file<span class="token operator">></span><span class="token punctuation">&#125;</span><span class="token punctuation">]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>-table参数是关键的配置参数，指定了块设备的类型，并根据类型传递了不同的参数。</p>
+<h2 id="thin-thin-pool"><a href="#thin-thin-pool" class="headerlink" title="thin, thin-pool"></a>thin, thin-pool</h2><p>thin-provisioning 是dm提供的一种存储类型。</p>
+<p>可以将多个虚拟设备存放在同一个数据卷上，减缓了管理，并通过共享数据减少了存储开销。</p>
+<p>而且支持快照和递归快照。</p>
+<p>kernel文件<code>Documentation/device-mapper/thin-provisioning.txt</code>文件中又相继介绍，它将元数据和数据分开，元数据设备的推荐容量是</p>
+<pre class="line-numbers language-none"><code class="language-none">48 * $data_dev_size &#x2F; $data_block_size, rount up to 2MB<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<h3 id="创建一个thin-pool"><a href="#创建一个thin-pool" class="headerlink" title="创建一个thin-pool"></a>创建一个thin-pool</h3><p>thin就是在thin-pool中创建的虚拟设备。</p>
+<p>首先需要准备一个metadata设备，可以用一个文件代替：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">dd</span> <span class="token assign-left variable">if</span><span class="token operator">=</span>/dev/zero <span class="token assign-left variable">of</span><span class="token operator">=</span>metadata <span class="token assign-left variable">bs</span><span class="token operator">=</span><span class="token number">512</span> <span class="token assign-left variable">count</span><span class="token operator">=</span><span class="token number">100000</span>	<span class="token comment">#zero设备提供无限的空字符</span>
+losetup /dev/loop0 ./metadata					<span class="token comment">#将metadata文件虚拟成块设备可以挂载</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+<p>然后就得到了metadata的虚拟块设备，之后可以创建pool</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">dmsetup create pool --table <span class="token string">"0 1000000 thin-pool /dev/loop0 /dev/loop1 512 1000"</span>
+<span class="token comment">#参数含义如下：</span>
+	dmsetup create pool <span class="token punctuation">\</span>
+	--table <span class="token string">"0 20971520 thin-pool <span class="token variable">$metadata_dev</span> <span class="token variable">$data_dev</span> \
+	 <span class="token variable">$data_block_size</span> <span class="token variable">$low_water_mark</span>"</span>
+
+<span class="token comment">#pool:              自定义的名字</span>
+<span class="token comment">#0:                 开始扇区</span>
+<span class="token comment">#20971520:          结束扇区</span>
+<span class="token comment">#thin-pool:         设备类型</span>
+<span class="token comment">#$metadata_dev:     存放元数据的设备</span>
+<span class="token comment">#$data_dev:         存放数据的设备</span>
+<span class="token comment">#$data_block_size:  数据块大小</span>
+<span class="token comment">#$low_water_mark:   空闲的数据块少于该数值时，发送通知</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>然后使用<code>dmsetup ls</code>或者<code>dmsetup table</code>就可以查看到该设备。</p>
+<h3 id="创建thin"><a href="#创建thin" class="headerlink" title="创建thin"></a>创建thin</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">dmsetup message /dev/mapper/pool <span class="token number">0</span> <span class="token string">"create_thin 0"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>其中，0 是为thin创建的标记号（identifier），不能重复，用户管理。</p>
+<p>激活：</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">dmsetup create thin --table <span class="token string">"0 1000 thin /dev/mapper/pool 0"</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+
+<p>thin是自定义的名字，可以查看。</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$dmsetup</span> <span class="token function">ls</span>
+thin	<span class="token punctuation">(</span><span class="token number">253</span>:4<span class="token punctuation">)</span>
+
+<span class="token variable">$ls</span> /dev/mapper/thin
+/dev/mapper/thin
+
+<span class="token variable">$ls</span> -lh thin
+lrwxrwxrwx. <span class="token number">1</span> root root <span class="token number">7</span> Jul <span class="token number">10</span> 05:22 thin -<span class="token operator">></span> <span class="token punctuation">..</span>/dm-4<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="删除thin"><a href="#删除thin" class="headerlink" title="删除thin"></a>删除thin</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">dmsetup message /dev/mapper/pool <span class="token number">0</span> <span class="token string">"delete 0"</span>
+dmsetup remove thin<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+
+
+
+
+
+<h2 id="dm-linear"><a href="#dm-linear" class="headerlink" title="dm-linear"></a>dm-linear</h2><blockquote>
+  <pre class="line-numbers language-none"><code class="language-none">Device-Mapper&#39;s &quot;linear&quot; target maps a linear range of the Device-Mapper
+device onto a linear range of another device.  
+This is the basic building block of logical volume managers.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+
+<p>  dm-linear就是将一个先行区间的dm设备映射到另一个先行区间的设备，基于逻辑卷的管理进行的？</p>
+</blockquote>
+<p>kernel文档也没写多少，直接写代码吧</p>
+<h3 id="创建一个设备："><a href="#创建一个设备：" class="headerlink" title="创建一个设备："></a>创建一个设备：</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token shebang important">#!/bin/sh</span>
+<span class="token comment"># Create an identity mapping for a device</span>
+<span class="token builtin class-name">echo</span> <span class="token string">"0 <span class="token variable"><span class="token variable">`</span>blockdev --getsz $1<span class="token variable">`</span></span> linear <span class="token variable">$1</span> 0"</span> <span class="token operator">|</span> dmsetup create identity
+<span class="token comment">#这里是创建了一个设备，blockdev --getsz 是获取命令行参数提供的设备的大小。</span>
+<span class="token comment"># “0，size, linear, device, 0”分别对应</span>
+<span class="token comment"># logical_start_sector</span>
+<span class="token comment"># number_sectors</span>
+<span class="token comment"># target_type        #type之后的参数数据target_type_args不同type不同参数</span>
+<span class="token comment"># destination_device</span>
+<span class="token comment"># start_sector</span>
+<span class="token comment"># identify           #创建的目标设备，目标设备会在/dev/mapper/中</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="两个设备合并成一个设备"><a href="#两个设备合并成一个设备" class="headerlink" title="两个设备合并成一个设备"></a>两个设备合并成一个设备</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token shebang important">#!/bin/sh</span>
+<span class="token comment"># Join 2 devices together</span>
+<span class="token assign-left variable">size1</span><span class="token operator">=</span><span class="token variable"><span class="token variable">`</span>blockdev --getsz $1<span class="token variable">`</span></span>
+<span class="token assign-left variable">size2</span><span class="token operator">=</span><span class="token variable"><span class="token variable">`</span>blockdev --getsz $2<span class="token variable">`</span></span>
+<span class="token comment">#下面echo其实就是一个table，</span>
+<span class="token comment">#本行起始逻辑地址|本行逻辑长度|linear|设备|这块长度对应到设备上的起始地址</span>
+<span class="token comment">#多行做成一个表格，送给dmsetup create dm_device_name "table"</span>
+<span class="token builtin class-name">echo</span> <span class="token string">"0 <span class="token variable">$size1</span> linear <span class="token variable">$1</span> 0
+<span class="token variable">$size1</span> <span class="token variable">$size2</span> linear <span class="token variable">$2</span> 0"</span> <span class="token operator">|</span> dmsetup create joined<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h3 id="将一个设备分成固定大小的块，然后反向组合"><a href="#将一个设备分成固定大小的块，然后反向组合" class="headerlink" title="将一个设备分成固定大小的块，然后反向组合"></a>将一个设备分成固定大小的块，然后反向组合</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token shebang important">#!/usr/bin/perl -w</span>
+<span class="token comment"># Split a device into 4M chunks and then join them together in reverse order.</span>
+
+my <span class="token variable">$name</span> <span class="token operator">=</span> <span class="token string">"reverse"</span><span class="token punctuation">;</span>
+my <span class="token variable">$extent_size</span> <span class="token operator">=</span> <span class="token number">4</span> * <span class="token number">1024</span> * <span class="token number">2</span><span class="token punctuation">;</span>
+my <span class="token variable">$dev</span> <span class="token operator">=</span> <span class="token variable">$ARGV</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+my <span class="token variable">$table</span> <span class="token operator">=</span> <span class="token string">""</span><span class="token punctuation">;</span>
+my <span class="token variable">$count</span> <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
+
+<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>defined<span class="token punctuation">(</span><span class="token variable">$dev</span><span class="token punctuation">))</span> <span class="token punctuation">&#123;</span>
+        die<span class="token punctuation">(</span><span class="token string">"Please specify a device.<span class="token entity" title="\n">\n</span>"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+my <span class="token variable">$dev_size</span> <span class="token operator">=</span> <span class="token variable"><span class="token variable">`</span>blockdev --getsz $dev<span class="token variable">`</span></span><span class="token punctuation">;</span>
+my <span class="token variable">$extents</span> <span class="token operator">=</span> int<span class="token punctuation">(</span><span class="token variable">$dev_size</span> / <span class="token variable">$extent_size</span><span class="token punctuation">)</span> -
+              <span class="token punctuation">((</span><span class="token variable">$dev_size</span> % <span class="token variable">$extent_size</span><span class="token punctuation">)</span> ? <span class="token number">1</span> <span class="token builtin class-name">:</span> <span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token keyword">while</span> <span class="token punctuation">(</span><span class="token variable">$extents</span> <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span>
+        my <span class="token variable">$this_start</span> <span class="token operator">=</span> <span class="token variable">$count</span> * <span class="token variable">$extent_size</span><span class="token punctuation">;</span>
+        <span class="token variable">$extents</span>--<span class="token punctuation">;</span>
+        <span class="token variable">$count</span>++<span class="token punctuation">;</span>
+        my <span class="token variable">$this_offset</span> <span class="token operator">=</span> <span class="token variable">$extents</span> * <span class="token variable">$extent_size</span><span class="token punctuation">;</span>
+
+        <span class="token variable">$table</span> .<span class="token operator">=</span> <span class="token string">"<span class="token variable">$this_start</span> <span class="token variable">$extent_size</span> linear <span class="token variable">$dev</span> <span class="token variable">$this_offset</span><span class="token entity" title="\n">\n</span>"</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token variable"><span class="token variable">`</span><span class="token builtin class-name">echo</span> <span class="token punctuation">\</span>"$table<span class="token punctuation">\</span>" <span class="token operator">|</span> dmsetup create $name<span class="token variable">`</span></span><span class="token punctuation">;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+
+
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/Device-Mapper/" rel="tag"># Device Mapper</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/12/07/%E6%B5%B7%E8%B4%BC%E7%8E%8B/" rel="prev" title="海贼王">
+                  <i class="fa fa-chevron-left"></i> 海贼王
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">GS & XXJ</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>

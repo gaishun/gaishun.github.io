@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 5.4.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.1.1/css/all.min.css" integrity="sha256-DfWjNxDkM94fVBWx1H5BMMp0Zq7luBlV8QRcSES7s+0=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"jiajiazi.cn","root":"/","images":"/images","scheme":"Muse","darkmode":false,"version":"8.11.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":false,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="之前搞了Go版本的，但是C++版本的感觉编码要复杂一些，提前学一下，说不定以后就用得上。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="gRPC-C++">
+<meta property="og:url" content="http://jiajiazi.cn/2021/09/12/gRPC-C/index.html">
+<meta property="og:site_name" content="FOR LIFE">
+<meta property="og:description" content="之前搞了Go版本的，但是C++版本的感觉编码要复杂一些，提前学一下，说不定以后就用得上。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2021-09-12T05:21:01.000Z">
+<meta property="article:modified_time" content="2022-05-13T15:52:51.771Z">
+<meta property="article:author" content="GS &amp; XXJ">
+<meta property="article:tag" content="grpc">
+<meta property="article:tag" content="c++">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="http://jiajiazi.cn/2021/09/12/gRPC-C/">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"http://jiajiazi.cn/2021/09/12/gRPC-C/","path":"2021/09/12/gRPC-C/","title":"gRPC-C++"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>gRPC-C++ | FOR LIFE</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">FOR LIFE</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Environment"><span class="nav-number">1.</span> <span class="nav-text">Environment</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Prepare"><span class="nav-number">2.</span> <span class="nav-text">Prepare</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#test-proto-file-context"><span class="nav-number">2.1.</span> <span class="nav-text">test.proto file context</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#compile-for-pb"><span class="nav-number">2.2.</span> <span class="nav-text">compile for pb</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FILE"><span class="nav-number">3.</span> <span class="nav-text">FILE</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#struct-amp-CMakeList-txt"><span class="nav-number">3.1.</span> <span class="nav-text">struct &amp; CMakeList.txt</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#common-cmake"><span class="nav-number">3.2.</span> <span class="nav-text">common.cmake</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#server-cpp"><span class="nav-number">3.3.</span> <span class="nav-text">server.cpp</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#client-cpp"><span class="nav-number">3.4.</span> <span class="nav-text">client.cpp</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">GS & XXJ</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives/">
+          <span class="site-state-item-count">23</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags/">
+        <span class="site-state-item-count">20</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://jiajiazi.cn/2021/09/12/gRPC-C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="GS & XXJ">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="FOR LIFE">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="gRPC-C++ | FOR LIFE">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          gRPC-C++
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2021-09-12 13:21:01" itemprop="dateCreated datePublished" datetime="2021-09-12T13:21:01+08:00">2021-09-12</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-05-13 23:52:51" itemprop="dateModified" datetime="2022-05-13T23:52:51+08:00">2022-05-13</time>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>之前搞了Go版本的，但是C++版本的感觉编码要复杂一些，提前学一下，说不定以后就用得上。</p>
+<span id="more"></span>
+
+<h3 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h3><p>先要搞好环境，这里是用的cmake的版本是3.16.3, ubuntu 18.04。</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment">#可以添加MY_INSTALL_DIR环境变量</span>
+<span class="token function">mkdir</span> ~/.local
+<span class="token builtin class-name">export</span> <span class="token assign-left variable">MY_INSTALL_DIR</span><span class="token operator">=~</span>/.local
+
+<span class="token comment">#安装ubuntu的一些环境</span>
+$ <span class="token function">sudo</span> <span class="token function">apt</span> <span class="token function">install</span> -y build-essential autoconf libtool pkg-config
+<span class="token comment">#git下grpc的包grpc 290多MB，还有其他的子模块500MB左右。</span>
+$ <span class="token function">git</span> clone --recurse-submodules -b v1.38.0 https://github.com/grpc/grpc
+<span class="token comment">#build and install gRPC, protocol buffers, and Abseil</span>
+$ <span class="token builtin class-name">cd</span> grpc
+<span class="token comment">#下载子模块</span>
+$ <span class="token function">mkdir</span> -p cmake/build
+$ <span class="token function">pushd</span> cmake/build
+<span class="token comment">#cmake</span>
+<span class="token comment">#DCMAKE_INSTALL_PREFIX D是Define的意思，后面的是要编译的文件所在的路径</span>
+$ cmake -DgRPC_INSTALL<span class="token operator">=</span>ON <span class="token punctuation">\</span>
+      -DgRPC_BUILD_TESTS<span class="token operator">=</span>OFF <span class="token punctuation">\</span>
+      -DCMAKE_INSTALL_PREFIX<span class="token operator">=</span><span class="token variable">$MY_INSTALL_DIR</span> <span class="token punctuation">\</span>
+      <span class="token punctuation">..</span>/<span class="token punctuation">..</span>
+<span class="token comment">#make</span>
+$ <span class="token function">make</span> -j
+$ <span class="token function">sudo</span> <span class="token function">make</span> <span class="token function">install</span>
+$ <span class="token function">popd</span>
+$ <span class="token function">mkdir</span> -p third_party/abseil-cpp/cmake/build
+$ <span class="token function">pushd</span> third_party/abseil-cpp/cmake/build
+$ cmake -DCMAKE_INSTALL_PREFIX<span class="token operator">=</span><span class="token variable">$MY_INSTALL_DIR</span> <span class="token punctuation">\</span>
+      -DCMAKE_POSITION_INDEPENDENT_CODE<span class="token operator">=</span>TRUE <span class="token punctuation">\</span>
+      <span class="token punctuation">..</span>/<span class="token punctuation">..</span>
+$ <span class="token function">make</span> -j
+$ <span class="token function">make</span> <span class="token function">install</span>
+$ <span class="token function">popd</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>以上没有问题基本就没有问题了，测试一下测试用例</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ <span class="token builtin class-name">cd</span> examples/cpp/helloworld
+
+$ <span class="token function">mkdir</span> -p cmake/build
+$ <span class="token function">pushd</span> cmake/build
+$ cmake -DCMAKE_PREFIX_PATH<span class="token operator">=</span><span class="token variable">$MY_INSTALL_DIR</span> <span class="token punctuation">..</span>/<span class="token punctuation">..</span>
+$ <span class="token function">make</span> -j<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>没问题就可以了，开始写代码。</p>
+<h3 id="Prepare"><a href="#Prepare" class="headerlink" title="Prepare"></a>Prepare</h3><h4 id="test-proto-file-context"><a href="#test-proto-file-context" class="headerlink" title="test.proto file context"></a>test.proto file context</h4><p>proto文件仍然用之前go语言时用的文件<code>test.proto</code></p>
+<pre class="line-numbers language-protobuf" data-language="protobuf"><code class="language-protobuf"><span class="token keyword">syntax</span> <span class="token operator">=</span> <span class="token string">"proto3"</span><span class="token punctuation">;</span>
+
+<span class="token keyword">package</span> grpc_test<span class="token punctuation">;</span>
+<span class="token keyword">option</span> go_package<span class="token operator">=</span><span class="token string">"../../grpc_test"</span><span class="token punctuation">;</span>
+<span class="token comment">// The greeting service definition.</span>
+<span class="token comment">// 单请求、回复rpc</span>
+<span class="token keyword">service</span> <span class="token class-name">Greeter</span> <span class="token punctuation">&#123;</span>
+  <span class="token comment">// Sends a greeting</span>
+  <span class="token keyword">rpc</span> <span class="token function">SayHello</span> <span class="token punctuation">(</span><span class="token class-name">HelloRequest</span><span class="token punctuation">)</span> <span class="token keyword">returns</span> <span class="token punctuation">(</span><span class="token class-name">HelloReply</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+  <span class="token keyword">rpc</span> <span class="token function">SayHelloAll</span> <span class="token punctuation">(</span><span class="token keyword">stream</span> <span class="token class-name">HelloRequest</span><span class="token punctuation">)</span> <span class="token keyword">returns</span> <span class="token punctuation">(</span><span class="token keyword">stream</span> <span class="token class-name">HelloReply</span><span class="token punctuation">)</span> <span class="token punctuation">&#123;</span><span class="token punctuation">&#125;</span>
+<span class="token punctuation">&#125;</span>
+<span class="token comment">// The request message containing the user's name.</span>
+<span class="token keyword">message</span> <span class="token class-name">HelloRequest</span> <span class="token punctuation">&#123;</span>
+  <span class="token builtin">string</span> name <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span>
+
+<span class="token comment">// The response message containing the greetings</span>
+<span class="token keyword">message</span> <span class="token class-name">HelloReply</span> <span class="token punctuation">&#123;</span>
+  <span class="token builtin">string</span> message <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
+<span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="compile-for-pb"><a href="#compile-for-pb" class="headerlink" title="compile for pb"></a>compile for pb</h4><p>这里用的是grpc make install时候安装的protoc，版本是3.15.8</p>
+<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">protoc --grpc_out<span class="token operator">=</span>. --plugin<span class="token operator">=</span>protoc-gen-grpc<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">which</span> grpc_cpp_plugin<span class="token variable">`</span></span> test.proto 
+<span class="token comment"># get test.grpc.pb.h &amp; test.grpc.pb.cc</span>
+protoc --cpp_out<span class="token operator">=</span>. test.proto
+<span class="token comment"># get test.pb.h &amp; test.pb.cc</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>然后就可以得到<code>test.pb.h</code> ，<code>test.pb.cc</code>，<code>test.grpc.pb.h</code>和<code>test.grpc.pb.cc</code>四个文件，前两个包含除了<code>Service</code>的部分，后面的包含具体的<code>Message</code>部分，然后就可以编写<code>client.cpp</code>和<code>server.cpp</code>两个文件。</p>
+<h3 id="FILE"><a href="#FILE" class="headerlink" title="FILE"></a>FILE</h3><h4 id="struct-amp-CMakeList-txt"><a href="#struct-amp-CMakeList-txt" class="headerlink" title="struct &amp; CMakeList.txt"></a>struct &amp; CMakeList.txt</h4><p>项目的结构是这样的：</p>
+<pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">header&#x2F;				&#x2F;&#x2F;存放头文件
+├── test.grpc.pb.h
+└── test.pb.h
+target&#x2F;				&#x2F;&#x2F;存放有main函数的cpp文件，用来生成可执行文件
+├── client.cpp
+└── server.cpp
+source&#x2F;             &#x2F;&#x2F;存放源文件
+├── test.grpc.pb.cc
+└── test.pb.cc
+CMakeLists.txt
+common.cmake <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>根据目录结构写出<code>CMakeList.txt</code>文件，参照了<code>grpc</code>官方的<code>CMakeList.txt</code>，其中有一个比较重要的<code>common.cmake</code>的引用，但是我还没看明白他是怎么区分的。之后再说，<code>CMakeList.txt</code>文件内容如下：</p>
+<pre class="line-numbers language-cmake" data-language="cmake"><code class="language-cmake"><span class="token keyword">cmake_minimum_required</span><span class="token punctuation">(</span><span class="token property">VERSION</span> <span class="token number">3.16.3</span><span class="token punctuation">)</span>
+<span class="token keyword">project</span><span class="token punctuation">(</span>grpcpp_test<span class="token punctuation">)</span>
+
+<span class="token comment">#用已经写好的cmake模块作为辅助</span>
+<span class="token keyword">include</span><span class="token punctuation">(</span>./common.cmake<span class="token punctuation">)</span>
+<span class="token comment">#stdc++=11</span>
+<span class="token keyword">set</span><span class="token punctuation">(</span><span class="token variable">CMAKE_CXX_STANDARD</span> <span class="token number">11</span><span class="token punctuation">)</span>
+<span class="token comment">#将这两个文件夹中的内容加入编译范围</span>
+<span class="token function">AUX_SOURCE_DIRECTORY</span><span class="token punctuation">(</span> source/ SOURCEFILE<span class="token punctuation">)</span>
+<span class="token function">AUX_SOURCE_DIRECTORY</span><span class="token punctuation">(</span> header/ HEADER<span class="token punctuation">)</span>
+<span class="token comment">#先编译出链接文件</span>
+<span class="token keyword">add_library</span><span class="token punctuation">(</span>DEPEND <span class="token punctuation">$&#123;</span>SOURCEFILE<span class="token punctuation">&#125;</span> <span class="token punctuation">$&#123;</span>HEADER<span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+<span class="token keyword">target_link_libraries</span><span class="token punctuation">(</span>DEPEND
+        <span class="token punctuation">$&#123;</span>_GRPC_GRPCPP<span class="token punctuation">&#125;</span>
+        <span class="token punctuation">$&#123;</span>_PROTOBUF_LIBPROTOBUF<span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+<span class="token comment">#对每个需要作为执行目标的文件进行编译同时加入编译选项</span>
+<span class="token keyword">foreach</span><span class="token punctuation">(</span>_target
+        client server<span class="token punctuation">)</span>
+    <span class="token keyword">add_executable</span><span class="token punctuation">(</span><span class="token punctuation">$&#123;</span>_target<span class="token punctuation">&#125;</span> target/<span class="token punctuation">$&#123;</span>_target<span class="token punctuation">&#125;</span>.cpp<span class="token punctuation">)</span>
+    <span class="token keyword">target_link_libraries</span><span class="token punctuation">(</span><span class="token punctuation">$&#123;</span>_target<span class="token punctuation">&#125;</span>
+            DEPEND
+            <span class="token punctuation">$&#123;</span>_GRPC_GRPCPP<span class="token punctuation">&#125;</span>
+            <span class="token punctuation">$&#123;</span>_PROTOBUF_LIBPROTOBUF<span class="token punctuation">&#125;</span><span class="token punctuation">)</span>
+<span class="token keyword">endforeach</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="common-cmake"><a href="#common-cmake" class="headerlink" title="common.cmake"></a>common.cmake</h4><p><code>common.cmake</code>文件内容较长，这里也贴出来吧，建议通过目录索引阅读：</p>
+<pre class="line-numbers language-cmake" data-language="cmake"><code class="language-cmake"><span class="token comment"># Copyright 2018 gRPC authors.</span>
+<span class="token comment">#</span>
+<span class="token comment"># Licensed under the Apache License, Version 2.0 (the "License");</span>
+<span class="token comment"># you may not use this file except in compliance with the License.</span>
+<span class="token comment"># You may obtain a copy of the License at</span>
+<span class="token comment">#</span>
+<span class="token comment">#     http://www.apache.org/licenses/LICENSE-2.0</span>
+<span class="token comment">#</span>
+<span class="token comment"># Unless required by applicable law or agreed to in writing, software</span>
+<span class="token comment"># distributed under the License is distributed on an "AS IS" BASIS,</span>
+<span class="token comment"># WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span>
+<span class="token comment"># See the License for the specific language governing permissions and</span>
+<span class="token comment"># limitations under the License.</span>
+<span class="token comment">#</span>
+<span class="token comment"># cmake build file for C++ route_guide example.</span>
+<span class="token comment"># Assumes protobuf and gRPC have been installed using cmake.</span>
+<span class="token comment"># See cmake_externalproject/CMakeLists.txt for all-in-one cmake build</span>
+<span class="token comment"># that automatically builds all the dependencies before building route_guide.</span>
+
+<span class="token keyword">cmake_minimum_required</span><span class="token punctuation">(</span><span class="token property">VERSION</span> <span class="token number">3.5.1</span><span class="token punctuation">)</span>
+
+<span class="token keyword">set</span> <span class="token punctuation">(</span><span class="token variable">CMAKE_CXX_STANDARD</span> <span class="token number">11</span><span class="token punctuation">)</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">MSVC</span><span class="token punctuation">)</span>
+  <span class="token keyword">add_definitions</span><span class="token punctuation">(</span>-D_WIN32_WINNT=0x600<span class="token punctuation">)</span>
+<span class="token keyword">endif</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+<span class="token keyword">find_package</span><span class="token punctuation">(</span>Threads REQUIRED<span class="token punctuation">)</span>
+
+<span class="token keyword">if</span><span class="token punctuation">(</span>GRPC_AS_SUBMODULE<span class="token punctuation">)</span>
+  <span class="token comment"># One way to build a projects that uses gRPC is to just include the</span>
+  <span class="token comment"># entire gRPC project tree via "add_subdirectory".</span>
+  <span class="token comment"># This approach is very simple to use, but the are some potential</span>
+  <span class="token comment"># disadvantages:</span>
+  <span class="token comment"># * it includes gRPC's CMakeLists.txt directly into your build script</span>
+  <span class="token comment">#   without and that can make gRPC's internal setting interfere with your</span>
+  <span class="token comment">#   own build.</span>
+  <span class="token comment"># * depending on what's installed on your system, the contents of submodules</span>
+  <span class="token comment">#   in gRPC's third_party/* might need to be available (and there might be</span>
+  <span class="token comment">#   additional prerequisites required to build them). Consider using</span>
+  <span class="token comment">#   the gRPC_*_PROVIDER options to fine-tune the expected behavior.</span>
+  <span class="token comment">#</span>
+  <span class="token comment"># A more robust approach to add dependency on gRPC is using</span>
+  <span class="token comment"># cmake's ExternalProject_Add (see cmake_externalproject/CMakeLists.txt).</span>
+
+  <span class="token comment"># Include the gRPC's cmake build (normally grpc source code would live</span>
+  <span class="token comment"># in a git submodule called "third_party/grpc", but this example lives in</span>
+  <span class="token comment"># the same repository as gRPC sources, so we just look a few directories up)</span>
+  <span class="token keyword">add_subdirectory</span><span class="token punctuation">(</span>../../.. <span class="token punctuation">$&#123;</span><span class="token variable">CMAKE_CURRENT_BINARY_DIR</span><span class="token punctuation">&#125;</span>/grpc <span class="token property">EXCLUDE_FROM_ALL</span><span class="token punctuation">)</span>
+  <span class="token keyword">message</span><span class="token punctuation">(</span>STATUS <span class="token string">"Using gRPC via add_subdirectory."</span><span class="token punctuation">)</span>
+
+  <span class="token comment"># After using add_subdirectory, we can now use the grpc targets directly from</span>
+  <span class="token comment"># this build.</span>
+  <span class="token keyword">set</span><span class="token punctuation">(</span>_PROTOBUF_LIBPROTOBUF libprotobuf<span class="token punctuation">)</span>
+  <span class="token keyword">set</span><span class="token punctuation">(</span>_REFLECTION grpc++_reflection<span class="token punctuation">)</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">CMAKE_CROSSCOMPILING</span><span class="token punctuation">)</span>
+    <span class="token keyword">find_program</span><span class="token punctuation">(</span>_PROTOBUF_PROTOC protoc<span class="token punctuation">)</span>
+  <span class="token keyword">else</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">set</span><span class="token punctuation">(</span>_PROTOBUF_PROTOC <span class="token punctuation">$&lt;</span>TARGET_FILE:<span class="token inserted class-name">protobuf::protoc</span><span class="token punctuation">></span><span class="token punctuation">)</span>
+  <span class="token keyword">endif</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token keyword">set</span><span class="token punctuation">(</span>_GRPC_GRPCPP grpc++<span class="token punctuation">)</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">CMAKE_CROSSCOMPILING</span><span class="token punctuation">)</span>
+    <span class="token keyword">find_program</span><span class="token punctuation">(</span>_GRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin<span class="token punctuation">)</span>
+  <span class="token keyword">else</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">set</span><span class="token punctuation">(</span>_GRPC_CPP_PLUGIN_EXECUTABLE <span class="token punctuation">$&lt;</span>TARGET_FILE:grpc_cpp_plugin<span class="token punctuation">></span><span class="token punctuation">)</span>
+  <span class="token keyword">endif</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">elseif</span><span class="token punctuation">(</span>GRPC_FETCHCONTENT<span class="token punctuation">)</span>
+  <span class="token comment"># Another way is to use CMake's FetchContent module to clone gRPC at</span>
+  <span class="token comment"># configure time. This makes gRPC's source code available to your project,</span>
+  <span class="token comment"># similar to a git submodule.</span>
+  <span class="token keyword">message</span><span class="token punctuation">(</span>STATUS <span class="token string">"Using gRPC via add_subdirectory (FetchContent)."</span><span class="token punctuation">)</span>
+  <span class="token keyword">include</span><span class="token punctuation">(</span>FetchContent<span class="token punctuation">)</span>
+  <span class="token function">FetchContent_Declare</span><span class="token punctuation">(</span>
+    grpc
+    GIT_REPOSITORY https://github.com/grpc/grpc.git
+    <span class="token comment"># when using gRPC, you will actually set this to an existing tag, such as</span>
+    <span class="token comment"># v1.25.0, v1.26.0 etc..</span>
+    <span class="token comment"># For the purpose of testing, we override the tag used to the commit</span>
+    <span class="token comment"># that's currently under test.</span>
+    GIT_TAG        vGRPC_TAG_VERSION_OF_YOUR_CHOICE<span class="token punctuation">)</span>
+  <span class="token function">FetchContent_MakeAvailable</span><span class="token punctuation">(</span>grpc<span class="token punctuation">)</span>
+
+  <span class="token comment"># Since FetchContent uses add_subdirectory under the hood, we can use</span>
+  <span class="token comment"># the grpc targets directly from this build.</span>
+  <span class="token keyword">set</span><span class="token punctuation">(</span>_PROTOBUF_LIBPROTOBUF libprotobuf<span class="token punctuation">)</span>
+  <span class="token keyword">set</span><span class="token punctuation">(</span>_REFLECTION grpc++_reflection<span class="token punctuation">)</span>
+  <span class="token keyword">set</span><span class="token punctuation">(</span>_PROTOBUF_PROTOC <span class="token punctuation">$&lt;</span>TARGET_FILE:protoc<span class="token punctuation">></span><span class="token punctuation">)</span>
+  <span class="token keyword">set</span><span class="token punctuation">(</span>_GRPC_GRPCPP grpc++<span class="token punctuation">)</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">CMAKE_CROSSCOMPILING</span><span class="token punctuation">)</span>
+    <span class="token keyword">find_program</span><span class="token punctuation">(</span>_GRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin<span class="token punctuation">)</span>
+  <span class="token keyword">else</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">set</span><span class="token punctuation">(</span>_GRPC_CPP_PLUGIN_EXECUTABLE <span class="token punctuation">$&lt;</span>TARGET_FILE:grpc_cpp_plugin<span class="token punctuation">></span><span class="token punctuation">)</span>
+  <span class="token keyword">endif</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">else</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token comment"># This branch assumes that gRPC and all its dependencies are already installed</span>
+  <span class="token comment"># on this system, so they can be located by find_package().</span>
+
+  <span class="token comment"># Find Protobuf installation</span>
+  <span class="token comment"># Looks for protobuf-config.cmake file installed by Protobuf's cmake installation.</span>
+  <span class="token keyword">set</span><span class="token punctuation">(</span>protobuf_MODULE_COMPATIBLE <span class="token boolean">TRUE</span><span class="token punctuation">)</span>
+  <span class="token keyword">find_package</span><span class="token punctuation">(</span>Protobuf CONFIG REQUIRED<span class="token punctuation">)</span>
+  <span class="token keyword">message</span><span class="token punctuation">(</span>STATUS <span class="token string">"Using protobuf <span class="token interpolation"><span class="token punctuation">$&#123;</span><span class="token variable">Protobuf_VERSION</span><span class="token punctuation">&#125;</span></span>"</span><span class="token punctuation">)</span>
+
+  <span class="token keyword">set</span><span class="token punctuation">(</span>_PROTOBUF_LIBPROTOBUF <span class="token inserted class-name">protobuf::libprotobuf</span><span class="token punctuation">)</span>
+  <span class="token keyword">set</span><span class="token punctuation">(</span>_REFLECTION <span class="token inserted class-name">gRPC::grpc</span>++_reflection<span class="token punctuation">)</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">CMAKE_CROSSCOMPILING</span><span class="token punctuation">)</span>
+    <span class="token keyword">find_program</span><span class="token punctuation">(</span>_PROTOBUF_PROTOC protoc<span class="token punctuation">)</span>
+  <span class="token keyword">else</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">set</span><span class="token punctuation">(</span>_PROTOBUF_PROTOC <span class="token punctuation">$&lt;</span>TARGET_FILE:<span class="token inserted class-name">protobuf::protoc</span><span class="token punctuation">></span><span class="token punctuation">)</span>
+  <span class="token keyword">endif</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+
+  <span class="token comment"># Find gRPC installation</span>
+  <span class="token comment"># Looks for gRPCConfig.cmake file installed by gRPC's cmake installation.</span>
+  <span class="token keyword">find_package</span><span class="token punctuation">(</span>gRPC CONFIG REQUIRED<span class="token punctuation">)</span>
+  <span class="token keyword">message</span><span class="token punctuation">(</span>STATUS <span class="token string">"Using gRPC <span class="token interpolation"><span class="token punctuation">$&#123;</span><span class="token variable">gRPC_VERSION</span><span class="token punctuation">&#125;</span></span>"</span><span class="token punctuation">)</span>
+
+  <span class="token keyword">set</span><span class="token punctuation">(</span>_GRPC_GRPCPP <span class="token inserted class-name">gRPC::grpc</span>++<span class="token punctuation">)</span>
+  <span class="token keyword">if</span><span class="token punctuation">(</span><span class="token variable">CMAKE_CROSSCOMPILING</span><span class="token punctuation">)</span>
+    <span class="token keyword">find_program</span><span class="token punctuation">(</span>_GRPC_CPP_PLUGIN_EXECUTABLE grpc_cpp_plugin<span class="token punctuation">)</span>
+  <span class="token keyword">else</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">set</span><span class="token punctuation">(</span>_GRPC_CPP_PLUGIN_EXECUTABLE <span class="token punctuation">$&lt;</span>TARGET_FILE:<span class="token inserted class-name">gRPC::grpc_cpp_plugin</span><span class="token punctuation">></span><span class="token punctuation">)</span>
+  <span class="token keyword">endif</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">endif</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<p>然后就是写<code>server.cpp</code>和<code>client.cpp</code>两个文件</p>
+<h4 id="server-cpp"><a href="#server-cpp" class="headerlink" title="server.cpp"></a>server.cpp</h4><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">&#x2F;&#x2F;
+&#x2F;&#x2F; Created by gs on 2021&#x2F;9&#x2F;12.
+&#x2F;&#x2F;
+
+#include &quot;..&#x2F;header&#x2F;test.grpc.pb.h&quot;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;grpcpp&#x2F;grpcpp.h&gt;
+
+using grpc::Server;
+using grpc::ServerBuilder;
+using grpc::ServerContext;
+using grpc::Status;
+using grpc::ServerReaderWriter;
+using grpc_test::Greeter;
+using grpc_test::HelloReply;
+using grpc_test::HelloRequest;
+
+
+&#x2F;&#x2F;继承Greeter类的Service类,这个类是继承了grpc::Service类的子类
+class GreeterServiceImpl final : public Greeter::Service&#123;
+
+    &#x2F;&#x2F;调用通过request获取请求信息，通过response返回信息。
+    Status SayHello(ServerContext* context, const HelloRequest* request, HelloReply* response) override&#123;
+        std::string prefix &#x3D; &quot;hello&quot;;
+        &#x2F;&#x2F;这里就是返回值了
+        response-&gt;set_message(prefix + request-&gt;name());
+        return Status::OK;
+    &#125;
+
+
+    &#x2F;&#x2F;这个用来打印日志使用。
+    void print (std::string temp)&#123;
+        char *a &#x3D; new char[4];
+        std::cout&lt;&lt;temp&lt;&lt;a&lt;&lt;std::endl;
+    &#125;
+    &#x2F;&#x2F;双向流式rpc服务
+    Status SayHelloAll(ServerContext* context, ServerReaderWriter&lt; HelloReply, HelloRequest&gt;* stream) override&#123;
+        grpc_test::HelloReply rep;
+        grpc_test::HelloRequest req;
+        std::string str;
+        char *a &#x3D; new char[4];
+        int count &#x3D; 0;
+        while(stream-&gt;Read(&amp;req))&#123;
+            str &#x3D; req.name();
+            sprintf(a,&quot;%3d\n&quot;,count++);
+            str +&#x3D; a;
+            print(str);
+            rep.set_message(str);
+            stream-&gt;Write(rep);
+        &#125;
+        return Status::OK;
+    &#125;
+
+public:
+    ~GreeterServiceImpl() override&#x3D; default;
+    GreeterServiceImpl() &#x3D; default;
+    bool Run ()&#123;
+        std::string address &#x3D; &quot;localhost:4306&quot;;
+        &#x2F;&#x2F;不知道
+        grpc::EnableDefaultHealthCheckService(true);
+        &#x2F;&#x2F;这个就是相当于添加了一些启动服务的options
+        ServerBuilder builder;
+        builder.AddListeningPort(address, grpc::InsecureServerCredentials());
+        builder.RegisterService(this);
+        &#x2F;&#x2F;启动服务
+        std::unique_ptr&lt;Server&gt; server(builder.BuildAndStart());
+        std::cout&lt;&lt;&quot;start successful listening on &quot;&lt;&lt;address&lt;&lt;std::endl;
+        &#x2F;&#x2F;保持。
+        server-&gt;Wait();
+        return true;
+    &#125;
+&#125;;
+
+int main ()&#123;
+    GreeterServiceImpl service;
+    service.Run();
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+<h4 id="client-cpp"><a href="#client-cpp" class="headerlink" title="client.cpp"></a>client.cpp</h4><pre class="line-numbers language-c++" data-language="c++"><code class="language-c++">&#x2F;&#x2F;
+&#x2F;&#x2F; Created by gs on 2021&#x2F;9&#x2F;12.
+&#x2F;&#x2F;
+#include &lt;iostream&gt;
+#include &lt;memory&gt;
+#include &lt;string&gt;
+
+#include &lt;grpcpp&#x2F;grpcpp.h&gt;
+#include &lt;thread&gt;
+#include &quot;..&#x2F;header&#x2F;test.grpc.pb.h&quot;
+
+using grpc::Channel;
+using grpc::ClientContext;
+using grpc::Status;
+
+using grpc_test::Greeter;
+using grpc_test::HelloRequest;
+using grpc_test::HelloReply;
+
+&#x2F;&#x2F;自己创建一个类，里面将grpc文件里面的Service_name的Stub作为成员变量进行使用。
+&#x2F;&#x2F;这个stud现在理解就是作为整个client的一个载体，放在任何一个类中都可以。
+class GreeterClient &#123;
+    std::unique_ptr&lt;Greeter::Stub&gt; _stub;
+public:
+    &#x2F;&#x2F;用一个channel来构建这个客户端，也就是用一个连接来实例化这个类。
+    GreeterClient(std::shared_ptr&lt;grpc::Channel&gt; channel):
+    _stub(Greeter::NewStub(channel))&#123;&#125;;
+    
+    std::string SayHello (const std::string &amp;user)&#123;
+        grpc_test::HelloRequest request;
+        request.set_name(user);
+        grpc_test::HelloReply rep;
+        &#x2F;&#x2F;这些ctx应该有什么作用，但是咱也不知道，等查一下官方的文档。
+        grpc::ClientContext ctx;
+
+        Status status &#x3D; _stub-&gt;SayHello(&amp;ctx, request, &amp;rep);
+
+        if (status.ok())&#123;
+            return rep.message();
+        &#125;else &#123;
+            std::cout&lt;&lt;&quot;SayHello err&quot;&lt;&lt;std::endl;
+            return &quot;RPC failed&quot;;
+        &#125;
+    &#125;
+
+    std::string SayHelloAll ()&#123;
+        grpc::ClientContext ctx;
+        std::shared_ptr&lt;grpc::ClientReaderWriter&lt;grpc_test::HelloRequest,grpc_test::HelloReply &gt;&gt; stream(
+                _stub-&gt;SayHelloAll(&amp;ctx)
+                );
+        &#x2F;&#x2F;用一个线程来执行读操作，没有新内容的时候这个线程是一直阻塞的。
+        std::thread Read([stream]()&#123;
+            grpc_test::HelloReply rep;
+            while(stream-&gt;Read(&amp;rep))&#123;
+                std::cout&lt;&lt;rep.message()&lt;&lt;std::endl;
+            &#125;
+        &#125;);
+        grpc_test::HelloRequest req;
+        req.set_name(&quot;hello world&quot;);
+        for(int i&#x3D;0;i&lt;100;i++)&#123;
+            stream-&gt;Write(req);
+        &#125;
+        stream-&gt;WritesDone();&#x2F;&#x2F;写操作完成
+        Read.join();&#x2F;&#x2F;等待Read线程结束
+        grpc::Status status &#x3D; stream-&gt;Finish();&#x2F;&#x2F;关闭流
+        if (!status.ok())&#123;
+          std::cout&lt;&lt;&quot;client finish stream failed, msg is &quot;&lt;&lt;status.error_message()&lt;&lt;std::endl;
+          return &quot;client finish stream failed&quot;;
+        &#125;
+        return &quot;success&quot;;
+    &#125;
+&#125;;
+
+int main ()&#123;
+    &#x2F;&#x2F;访问路径
+    std::string target_str &#x3D; &quot;localhost:4306&quot;;
+    &#x2F;&#x2F;这里的channel我理解就是一个连接的意思
+    GreeterClient greeter(
+            grpc::CreateChannel(target_str,grpc::InsecureChannelCredentials()));
+    std::string user &#x3D; &quot;world&quot;;
+    &#x2F;&#x2F;请求
+    std::string rep &#x3D; greeter.SayHello(user);
+    std::string rep2 &#x3D; greeter.SayHelloAll();
+    std::cout&lt;&lt;&quot;get reply : &quot;&lt;&lt;rep&lt;&lt;&quot;\nget reply2 : &quot;&lt;&lt;rep2&lt;&lt;std::endl;
+&#125;<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/grpc/" rel="tag"># grpc</a>
+              <a href="/tags/c/" rel="tag"># c++</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/2021/09/11/grpc-go/" rel="prev" title="grpc-go">
+                  <i class="fa fa-chevron-left"></i> grpc-go
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/2021/10/02/bianyineihe/" rel="next" title="编译内核">
+                  编译内核 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">GS & XXJ</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/muse/" rel="noopener" target="_blank">NexT.Muse</a> 强力驱动
+  </div>
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/schemes/muse.js"></script><script src="/js/next-boot.js"></script>
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+</body>
+</html>
