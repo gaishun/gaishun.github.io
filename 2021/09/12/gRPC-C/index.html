@@ -221,7 +221,7 @@
 <span id="more"></span>
 
 <h3 id="Environment"><a href="#Environment" class="headerlink" title="Environment"></a>Environment</h3><p>先要搞好环境，这里是用的cmake的版本是3.16.3, ubuntu 18.04。</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment">#可以添加MY_INSTALL_DIR环境变量</span>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token comment">#可以添加MY_INSTALL_DIR环境变量</span>
 <span class="token function">mkdir</span> ~/.local
 <span class="token builtin class-name">export</span> <span class="token assign-left variable">MY_INSTALL_DIR</span><span class="token operator">=~</span>/.local
 
@@ -254,7 +254,7 @@ $ <span class="token function">make</span> <span class="token function">install<
 $ <span class="token function">popd</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>以上没有问题基本就没有问题了，测试一下测试用例</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ <span class="token builtin class-name">cd</span> examples/cpp/helloworld
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">$ <span class="token builtin class-name">cd</span> examples/cpp/helloworld
 
 $ <span class="token function">mkdir</span> -p cmake/build
 $ <span class="token function">pushd</span> cmake/build
@@ -285,7 +285,7 @@ $ <span class="token function">make</span> -j<span aria-hidden="true" class="lin
 <span class="token punctuation">&#125;</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h4 id="compile-for-pb"><a href="#compile-for-pb" class="headerlink" title="compile for pb"></a>compile for pb</h4><p>这里用的是grpc make install时候安装的protoc，版本是3.15.8</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">protoc --grpc_out<span class="token operator">=</span>. --plugin<span class="token operator">=</span>protoc-gen-grpc<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">which</span> grpc_cpp_plugin<span class="token variable">`</span></span> test.proto 
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">protoc --grpc_out<span class="token operator">=</span>. --plugin<span class="token operator">=</span>protoc-gen-grpc<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token function">which</span> grpc_cpp_plugin<span class="token variable">`</span></span> test.proto 
 <span class="token comment"># get test.grpc.pb.h &amp; test.grpc.pb.cc</span>
 protoc --cpp_out<span class="token operator">=</span>. test.proto
 <span class="token comment"># get test.pb.h &amp; test.pb.cc</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>

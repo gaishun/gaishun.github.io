@@ -220,11 +220,11 @@
         <p>编译linux源码作为内核</p>
 <span id="more"></span>
 
-<h2 id="首先检查是否安装了相应的软件包"><a href="#首先检查是否安装了相应的软件包" class="headerlink" title="首先检查是否安装了相应的软件包"></a>首先检查是否安装了相应的软件包</h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ yum group list
-<span class="token comment">#原始输出如下</span>
+<h2 id="首先检查是否安装了相应的软件包"><a href="#首先检查是否安装了相应的软件包" class="headerlink" title="首先检查是否安装了相应的软件包"></a>首先检查是否安装了相应的软件包</h2><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">$ yum group list
+#原始输出如下
 Loaded plugins: fastestmirror, langpacks
-There is no installed <span class="token function">groups</span> file.
-Maybe run: yum <span class="token function">groups</span> mark convert <span class="token punctuation">(</span>see <span class="token function">man</span> yum<span class="token punctuation">)</span>
+There is no installed groups file.
+Maybe run: yum groups mark convert (see man yum)
 Loading mirror speeds from cached hostfile
 Available Environment Groups:
    Minimal Install
@@ -249,47 +249,47 @@ Available Groups:
    System Administration Tools
    System Management
 Done
-$ yum <span class="token function">groups</span>  <span class="token function">install</span>  <span class="token string">"Development and Creative Workstation"</span> <span class="token string">"Compatibility Libraries"</span> -y
-<span class="token comment">#这里安装了编译环境的包，并未为了后续编译安装了“Compatibility Libraries”包，需要等蛮久的</span>
+$ yum groups  install  &quot;Development and Creative Workstation&quot; &quot;Compatibility Libraries&quot; -y
+#这里安装了编译环境的包，并未为了后续编译安装了“Compatibility Libraries”包，需要等蛮久的
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h2 id="下载源码"><a href="#下载源码" class="headerlink" title="下载源码"></a>下载源码</h2><p>可以从官网上下载源码：<a target="_blank" rel="noopener" href="https://www.kernel.org/">https://www.kernel.org/</a></p>
 <p>也可以从镜像站下载源码：<a target="_blank" rel="noopener" href="https://mirrors.edge.kernel.org/pub/linux/kernel/">https://mirrors.edge.kernel.org/pub/linux/kernel/</a></p>
 <p>国内直接从镜像站下载还是比较靠谱的。</p>
 <p>这里我下载的是4.9.46版本，因为测试需要用这个版本的内核</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">wget</span> https://mirrors.edge.kernel.org/pub/linux/kernel/v4.x/linux-4.9.46.tar.gz<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">wget https:&#x2F;&#x2F;mirrors.edge.kernel.org&#x2F;pub&#x2F;linux&#x2F;kernel&#x2F;v4.x&#x2F;linux-4.9.46.tar.gz<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
-<h2 id="解压并创建符号链接"><a href="#解压并创建符号链接" class="headerlink" title="解压并创建符号链接"></a>解压并创建符号链接</h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">tar</span> zxf linux-4.9.46.tar.gz
-<span class="token function">ln</span> -sv linux-4.9.46 linux
-<span class="token builtin class-name">cd</span> linux<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h2 id="解压并创建符号链接"><a href="#解压并创建符号链接" class="headerlink" title="解压并创建符号链接"></a>解压并创建符号链接</h2><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">tar zxf linux-4.9.46.tar.gz
+ln -sv linux-4.9.46 linux
+cd linux<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 <p>这里符号链接可以理解成windows里面的快捷方式，创建好符号链接之后进到内核源码目录中</p>
 <h2 id="创建-config-文件"><a href="#创建-config-文件" class="headerlink" title="创建 .config 文件"></a>创建 .config 文件</h2><p>这个文件就是选需要加载的内核模块，使用<code>make menuconfig</code>就可以可视化的选择内核模块是否需要加载，但是因为是可视化的，所以就需要<code>ncurses</code>包的支持，然后先安装<code>ncurses</code>包，再执行<code>make menuconfig</code>命令就可以了。如果需要清除以前的配置，可以用<code>make mrproper</code>命令来清除以前的配置。</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">yum <span class="token function">install</span> ncurses ncurses-devel -y
-<span class="token function">make</span> mrproper
-<span class="token function">make</span> menuconfig<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">yum install ncurses ncurses-devel -y
+make mrproper
+make menuconfig<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 <p>以上就可以进入内核配置参数的界面。</p>
 <p>在配置的过程中，需要注意的是：</p>
 <ul>
-<li>[*]：编译到内核文件中去，类似<code>vmlinuz-**.el7.x86_64</code>中</li>
-<li>[M]：编译到模块文件中去，类似<code>/lib/modules/***.el7.x86_64/</code>目录中</li>
+<li>  [*]：编译到内核文件中去，类似<code>vmlinuz-**.el7.x86_64</code>中</li>
+<li>  [M]：编译到模块文件中去，类似<code>/lib/modules/***.el7.x86_64/</code>目录中</li>
 </ul>
 <h2 id="make"><a href="#make" class="headerlink" title="make"></a>make</h2><p>然后就可以执行make命令进行编译了</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">make</span>
-<span class="token comment">#出错了，需要安装openssl的包</span>
-$ yum <span class="token function">install</span> -y openssl.x86_64 openssl-devel.x86_64
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">$ make
+#出错了，需要安装openssl的包
+$ yum install -y openssl.x86_64 openssl-devel.x86_64
 
-$ <span class="token function">make</span> clean 
-$ <span class="token function">make</span> -j16<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+$ make clean 
+$ make -j16<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>如果编译出错了，可以执行<code>make clean</code>命令清楚之前编译出的文件，然后重新执行<code>make</code>命令进行编译。</p>
 <h2 id="执行-make-modules-install"><a href="#执行-make-modules-install" class="headerlink" title="执行 make modules_install"></a>执行 <code>make modules_install</code></h2><h2 id="执行make-install"><a href="#执行make-install" class="headerlink" title="执行make install"></a>执行<code>make install</code></h2><h2 id="reboot然后选择新编译好的linux内核"><a href="#reboot然后选择新编译好的linux内核" class="headerlink" title="reboot然后选择新编译好的linux内核"></a>reboot然后选择新编译好的linux内核</h2><h2 id="卸载内核"><a href="#卸载内核" class="headerlink" title="卸载内核"></a>卸载内核</h2><p>如果要卸载内核：</p>
 <ul>
-<li>删除<code>/lib/modules</code>目录下对应版本的库文件</li>
-<li>删除<code>/usr/src/linux</code>目录下的源码和压缩文件</li>
-<li>删除<code>/boot</code>启动的内核和内核镜像文件</li>
-<li>删除<code>grub.conf</code>配置文件新内核对应的条目</li>
+<li>  删除<code>/lib/modules</code>目录下对应版本的库文件</li>
+<li>  删除<code>/usr/src/linux</code>目录下的源码和压缩文件</li>
+<li>  删除<code>/boot</code>启动的内核和内核镜像文件</li>
+<li>  删除<code>grub.conf</code>配置文件新内核对应的条目</li>
 </ul>
 
     </div>

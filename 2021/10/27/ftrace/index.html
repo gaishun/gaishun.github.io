@@ -109,7 +109,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B2%E4%BB%80%E4%B9%88%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">干什么用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A6%96%E5%85%88%E8%A6%81%E6%8C%82%E8%BD%BDdebugfs"><span class="nav-number">2.1.</span> <span class="nav-text">首先要挂载debugfs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Function-x2F-Function-graph"><span class="nav-number">2.2.</span> <span class="nav-text">Function&#x2F;Function_graph</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8-x2F-%E5%85%B3%E9%97%AD"><span class="nav-number">3.</span> <span class="nav-text">启动&#x2F;关闭</span></a></li></ol></div>
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B9%B2%E4%BB%80%E4%B9%88%E7%94%A8"><span class="nav-number">1.</span> <span class="nav-text">干什么用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">使用</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A6%96%E5%85%88%E8%A6%81%E6%8C%82%E8%BD%BDdebugfs"><span class="nav-number">2.1.</span> <span class="nav-text">首先要挂载debugfs</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Function-Function-graph"><span class="nav-number">2.2.</span> <span class="nav-text">Function&#x2F;Function_graph</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8-%E5%85%B3%E9%97%AD"><span class="nav-number">3.</span> <span class="nav-text">启动&#x2F;关闭</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -221,31 +221,31 @@
 
 <h2 id="干什么用"><a href="#干什么用" class="headerlink" title="干什么用"></a>干什么用</h2><p>ftrace 是一个 Linux 内部的 trace 工具，能够帮助开发者和系统设计者知道内核当前正在干啥，从而更好的去分析性能问题。</p>
 <p>Ftrace 能帮我们分析内核特定的事件，譬如调度，中断等，也能帮我们去追踪动态的内核函数，以及这些函数的调用栈还有栈的使用这些。它也能帮我们去追踪延迟，譬如中断被屏蔽，抢占被禁止的时间，以及唤醒一个进程之后多久开始执行的时间。</p>
-<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="首先要挂载debugfs"><a href="#首先要挂载debugfs" class="headerlink" title="首先要挂载debugfs"></a>首先要挂载debugfs</h3><p>内核基本上已经已经都开起了debugfs&#x2F;tracdfs支持，在<code>/sys/kernel/debug</code>目录下有一个tracing目录，新的内核则是挂载在<code>sys/kernel/tracing</code>，但是都可已经将目录连接到<code>/tracing</code>目录下进行统一。</p>
-<h3 id="Function-x2F-Function-graph"><a href="#Function-x2F-Function-graph" class="headerlink" title="Function&#x2F;Function_graph"></a>Function&#x2F;Function_graph</h3><p>可以看看ftrace支持哪些插件，</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ <span class="token function">cat</span> avaliable_tracers
-hwlat blk mmiotrace function_graph wakeup_dl wakeup_rt wakeup <span class="token keyword">function</span> nop<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="首先要挂载debugfs"><a href="#首先要挂载debugfs" class="headerlink" title="首先要挂载debugfs"></a>首先要挂载debugfs</h3><p>内核基本上已经已经都开起了debugfs/tracdfs支持，在<code>/sys/kernel/debug</code>目录下有一个tracing目录，新的内核则是挂载在<code>sys/kernel/tracing</code>，但是都可已经将目录连接到<code>/tracing</code>目录下进行统一。</p>
+<h3 id="Function-Function-graph"><a href="#Function-Function-graph" class="headerlink" title="Function/Function_graph"></a>Function/Function_graph</h3><p>可以看看ftrace支持哪些插件，</p>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">$ cat avaliable_tracers
+hwlat blk mmiotrace function_graph wakeup_dl wakeup_rt wakeup function nop<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p>使用最多的是<code>function</code>和<code>functions_graph</code>两个插件，如果不行用trace了，可以置为<code>nop</code>。</p>
 <p>首先打开<code>function_graph</code>:</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ <span class="token builtin class-name">echo</span> function_graph <span class="token operator">></span> current_tracer 	<span class="token comment">#开启function_graph的tracer</span>
-$ <span class="token function">cat</span> current_tracer					<span class="token comment">#查看当前的tracer</span>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">$ echo function_graph &gt; current_tracer 	#开启function_graph的tracer
+$ cat current_tracer					#查看当前的tracer
 function_graph<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
 <p>然后这个tracer就开始工作了，会将相关的信息放在<code>trace</code>文件中，直接读取这个文件即可得到相关的信息。</p>
 <p>也可以设定只跟踪特定的function</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ <span class="token builtin class-name">echo</span> <span class="token function">write</span> <span class="token operator">></span> set_ftrace_fileter <span class="token comment">#输出是function</span>
-$ <span class="token builtin class-name">echo</span> <span class="token function">write</span> <span class="token operator">></span> set_graph_function <span class="token comment">#输出是function_graph</span>
-<span class="token comment">#$echo 3 > max_graph_depth		  #图的深度</span>
-$ <span class="token function">cat</span> set_ftrace_filter
-<span class="token function">write</span>
-$ <span class="token function">cat</span> trace <span class="token operator">|</span> <span class="token function">head</span> -n <span class="token number">15</span>
-<span class="token punctuation">..</span>.
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">$ echo write &gt; set_ftrace_fileter #输出是function
+$ echo write &gt; set_graph_function #输出是function_graph
+#$echo 3 &gt; max_graph_depth		  #图的深度
+$ cat set_ftrace_filter
+write
+$ cat trace | head -n 15
+...
 
-<span class="token comment">#不需要跟踪这个函数：</span>
-$ <span class="token builtin class-name">echo</span> <span class="token string">'!write'</span> <span class="token operator">></span> set_ftrace_filter <span class="token comment"># set_graph_function</span>
-<span class="token comment">#或者</span>
-$ <span class="token builtin class-name">echo</span> <span class="token function">write</span> <span class="token operator">></span> set_ftrace_notrace<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+#不需要跟踪这个函数：
+$ echo &#39;!write&#39; &gt; set_ftrace_filter # set_graph_function
+#或者
+$ echo write &gt; set_ftrace_notrace<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <p>Function filter 的设置也支持 <code>*match</code>，<code>match*</code> ，<code>*match*</code> 这样的正则表达式，譬如我们可以 <code>echo &#39;*lock*&#39; &lt; set_ftrace_notrace</code> 来禁止跟踪带 <code>lock</code> 的函数，<code>set_ftrace_notrace</code> 文件里面这时候就会显示：</p>
 <pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token function">cat</span> set_ftrace_notrace
@@ -258,7 +258,7 @@ set_task_blockstep
 user_enable_block_step
 <span class="token punctuation">..</span>.<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h2 id="启动-x2F-关闭"><a href="#启动-x2F-关闭" class="headerlink" title="启动&#x2F;关闭"></a>启动&#x2F;关闭</h2><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">$ <span class="token builtin class-name">echo</span> <span class="token number">1</span> <span class="token operator">></span> tracing_on
+<h2 id="启动-关闭"><a href="#启动-关闭" class="headerlink" title="启动/关闭"></a>启动/关闭</h2><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">$ <span class="token builtin class-name">echo</span> <span class="token number">1</span> <span class="token operator">></span> tracing_on
 $ <span class="token builtin class-name">echo</span> <span class="token number">0</span> <span class="token operator">></span> tracing_on<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <p>··· 待更新</p>

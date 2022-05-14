@@ -220,14 +220,14 @@
 <span id="more"></span>
 <h3 id="网络问题"><a href="#网络问题" class="headerlink" title="网络问题"></a>网络问题</h3><p>因为网络的问题，先把网络问题给解决掉。</p>
 <p>设置</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">export</span> <span class="token assign-left variable">GOPROXY</span><span class="token operator">=</span>https://goproxy.cn
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token builtin class-name">export</span> <span class="token assign-left variable">GOPROXY</span><span class="token operator">=</span>https://goproxy.cn
 <span class="token builtin class-name">export</span> <span class="token assign-left variable">GOMODULE</span><span class="token operator">=</span>on<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
 <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>其实个人感觉跟JAVA里面的maven差不多，一个以来管理工具。</p>
-<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">cd</span> <span class="token variable">$project_name</span>
+<h3 id="初始化"><a href="#初始化" class="headerlink" title="初始化"></a>初始化</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token builtin class-name">cd</span> <span class="token variable">$project_name</span>
 go mod init project_name<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
-<h3 id="检测依赖"><a href="#检测依赖" class="headerlink" title="检测依赖"></a>检测依赖</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">go mod tidy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="检测依赖"><a href="#检测依赖" class="headerlink" title="检测依赖"></a>检测依赖</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">go mod tidy<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>这个命令会检测该文件夹目录下所有引入的依赖，写入<code>go.mod</code>文件中，但是此时依赖还没有下载，类似：</p>
 <pre class="line-numbers language-makefile" data-language="makefile"><code class="language-makefile">module google.golang.org/grpc/examples
@@ -246,10 +246,10 @@ replace google.golang.org/grpc <span class="token operator">=</span>> ../<span a
 
 
 
-<h3 id="下载依赖"><a href="#下载依赖" class="headerlink" title="下载依赖"></a>下载依赖</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">go mod download<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="下载依赖"><a href="#下载依赖" class="headerlink" title="下载依赖"></a>下载依赖</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">go mod download<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>将依赖全部下载至GOPATH下，会在项目的根目录生成<code>go.sum</code>文件，这个文件是依赖的详细依赖。</p>
-<h3 id="导入依赖"><a href="#导入依赖" class="headerlink" title="导入依赖"></a>导入依赖</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">go mod vendor<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h3 id="导入依赖"><a href="#导入依赖" class="headerlink" title="导入依赖"></a>导入依赖</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">go mod vendor<span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
 
 <p>这里就是将GOPATH下的依赖转移至该项目根目录下的vendor目录下，此时就可以使用这些依赖了。</p>
 <h3 id="添加依赖"><a href="#添加依赖" class="headerlink" title="添加依赖"></a>添加依赖</h3><p>有两种方式可以添加依赖：</p>
@@ -257,7 +257,7 @@ replace google.golang.org/grpc <span class="token operator">=</span>> ../<span a
 <li>你只要在项目中有 import，然后 go build 就会 go module 就会自动下载并添加。</li>
 <li>自己手工使用 go get 下载安装后，会自动写入 go.mod 。</li>
 </ul>
-<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">go mod init  <span class="token comment"># 初始化go.mod</span>
+<h3 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">go mod init  <span class="token comment"># 初始化go.mod</span>
 go mod tidy  <span class="token comment"># 更新依赖文件</span>
 go mod download  <span class="token comment"># 下载依赖文件</span>
 go mod vendor  <span class="token comment"># 将依赖转移至本地的vendor文件</span>

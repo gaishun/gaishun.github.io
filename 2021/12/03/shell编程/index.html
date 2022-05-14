@@ -219,7 +219,7 @@
     <div class="post-body" itemprop="articleBody">
         <p>讲道理shell编程对自动化还是蛮重要的，所以特意写一个文档整理一下语法。</p>
 <span id="more"></span>
-<h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token assign-left variable">your_name</span><span class="token operator">=</span><span class="token string">"asdf"</span>
+<h3 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token assign-left variable">your_name</span><span class="token operator">=</span><span class="token string">"asdf"</span>
 <span class="token assign-left variable">your_name</span><span class="token operator">=</span><span class="token string">"fdsa"</span> <span class="token comment">#可以重新定义</span>
 
 <span class="token keyword">for</span> <span class="token for-or-select variable">file</span> <span class="token keyword">in</span> <span class="token variable"><span class="token variable">`</span><span class="token function">ls</span> /<span class="token variable">`</span></span>
@@ -233,7 +233,7 @@
 <span class="token builtin class-name">unset</span> url <span class="token comment">#删除变量</span>
 <span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment">#单引号</span>
+<h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token comment">#单引号</span>
 其中的变量无效
 单引号字符串中不能单独出现一个单引号，转义也不行，但是可以成对出现
 
@@ -259,7 +259,7 @@
 <span class="token comment">#查找字串</span>
 	<span class="token function">expr</span> index <span class="token string">"<span class="token variable">$your_name</span>"</span> st <span class="token comment">#查找第一个s 或 t的位置，这里输出0</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h3 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token assign-left variable">array</span><span class="token operator">=</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token number">2</span> <span class="token number">3</span> <span class="token number">4</span> <span class="token number">5</span><span class="token punctuation">)</span>
+<h3 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token assign-left variable">array</span><span class="token operator">=</span><span class="token punctuation">(</span><span class="token number">1</span> <span class="token number">2</span> <span class="token number">3</span> <span class="token number">4</span> <span class="token number">5</span><span class="token punctuation">)</span>
 array<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token operator">=</span><span class="token number">9</span>
 
 <span class="token variable">$&#123;array<span class="token punctuation">[</span>2<span class="token punctuation">]</span>&#125;</span>
@@ -268,7 +268,7 @@ array<span class="token punctuation">[</span><span class="token number">0</span>
 <span class="token variable">$&#123;<span class="token operator">#</span>array<span class="token punctuation">[</span>@<span class="token punctuation">]</span>&#125;</span>  <span class="token variable">$&#123;<span class="token operator">#</span>array<span class="token punctuation">[</span>*<span class="token punctuation">]</span>&#125;</span> <span class="token comment">#数组长度</span>
 <span class="token variable">$&#123;<span class="token operator">#</span>array<span class="token punctuation">[</span>n<span class="token punctuation">]</span>&#125;</span>	<span class="token comment">#第n个元素的长度</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h3 id="多行注释"><a href="#多行注释" class="headerlink" title="多行注释"></a>多行注释</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">:<span class="token operator">&lt;&lt;</span><span class="token string">"
+<h3 id="多行注释"><a href="#多行注释" class="headerlink" title="多行注释"></a>多行注释</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">:<span class="token operator">&lt;&lt;</span><span class="token string">"
 annotations
 "</span>
 
@@ -276,7 +276,7 @@ annotations
 annotations
 EOF</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h3 id="传递参数"><a href="#传递参数" class="headerlink" title="传递参数"></a>传递参数</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token variable">$0</span> <span class="token variable">$1</span> <span class="token variable">$2</span> <span class="token variable">$3</span>
+<h3 id="传递参数"><a href="#传递参数" class="headerlink" title="传递参数"></a>传递参数</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token variable">$0</span> <span class="token variable">$1</span> <span class="token variable">$2</span> <span class="token variable">$3</span>
 <span class="token variable">$0</span><span class="token builtin class-name">:</span> 执行的文件名，软连接直呼牛逼，其他的就是第一二三个参数。
 
 <span class="token variable">$#</span>:传递到脚本的参数个数
@@ -288,7 +288,7 @@ $-:显示shell当前使用的选项，与set命令相同
 <span class="token variable">$?</span>:显示最后命令的退出状态，0表示没有错误。<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
 <h3 id="基本运算符"><a href="#基本运算符" class="headerlink" title="基本运算符"></a>基本运算符</h3><p>不能直接写2+2，要用expr命令</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash">val <span class="token operator">=</span> <span class="token variable"><span class="token variable">`</span><span class="token function">expr</span> <span class="token number">2</span> + <span class="token number">2</span><span class="token variable">`</span></span> 		<span class="token comment"># + - * / % 五个都这样用</span>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell">val <span class="token operator">=</span> <span class="token variable"><span class="token variable">`</span><span class="token function">expr</span> <span class="token number">2</span> + <span class="token number">2</span><span class="token variable">`</span></span> 		<span class="token comment"># + - * / % 五个都这样用</span>
 a <span class="token operator">=</span> <span class="token variable">$b</span> <span class="token comment">#变量赋值 			 # = 这样用</span>
 <span class="token punctuation">[</span> <span class="token variable">$a</span> <span class="token operator">==</span> <span class="token variable">$b</span> <span class="token punctuation">]</span>			    <span class="token comment"># == != 两个这样用，一定要有空格</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
 
@@ -300,14 +300,14 @@ a <span class="token operator">=</span> <span class="token variable">$b</span> <
 -le #左边小于等于右边返回true
 #使用： [ $a -eq $b ]<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h3 id="布尔运算"><a href="#布尔运算" class="headerlink" title="布尔运算"></a>布尔运算</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token operator">!</span>		<span class="token comment">#[ ! false ]</span>
+<h3 id="布尔运算"><a href="#布尔运算" class="headerlink" title="布尔运算"></a>布尔运算</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token operator">!</span>		<span class="token comment">#[ ! false ]</span>
 -o	<span class="token comment">#[ $a -lt 20 -o $b -gt 100 ]</span>
 -a  <span class="token comment">#[ $a -lt 20 -a $b -gt 100 ]</span>
 
 <span class="token variable">$$</span>	<span class="token comment">#[[ $a -lt 20 &amp;&amp; $b -gt 100 ]]</span>
 <span class="token operator">||</span>	<span class="token comment">#[[ $a -lt 20 || $b -gt 100 ]]</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h3 id="字符串运算符"><a href="#字符串运算符" class="headerlink" title="字符串运算符"></a>字符串运算符</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token operator">=</span> 		<span class="token comment">#检测相等 									 [ $a = $b ]</span>
+<h3 id="字符串运算符"><a href="#字符串运算符" class="headerlink" title="字符串运算符"></a>字符串运算符</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token operator">=</span> 		<span class="token comment">#检测相等 									 [ $a = $b ]</span>
 <span class="token operator">!=</span> 		<span class="token comment">#检测不相等									[ $a != $b ]</span>
 -z 		<span class="token comment">#检测长度是否是0，是0返回true 	[ -z $a ]</span>
 -n 		<span class="token comment">#检测长度是否不是0，不是0返回true [ -n $a ]</span>
@@ -387,7 +387,7 @@ $			<span class="token comment">#检测是否为空，不空返回true		[$a]</sp
 <td align="left">[ -e $file ] 返回 true。‘</td>
 </tr>
 </tbody></table>
-<h3 id="test，用于检查某个条件是否成立"><a href="#test，用于检查某个条件是否成立" class="headerlink" title="test，用于检查某个条件是否成立"></a>test，用于检查某个条件是否成立</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token comment">#两个数</span>
+<h3 id="test，用于检查某个条件是否成立"><a href="#test，用于检查某个条件是否成立" class="headerlink" title="test，用于检查某个条件是否成立"></a>test，用于检查某个条件是否成立</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token comment">#两个数</span>
 <span class="token assign-left variable">num1</span><span class="token operator">=</span><span class="token number">100</span>
 <span class="token assign-left variable">num2</span><span class="token operator">=</span><span class="token number">100</span>
 <span class="token keyword">if</span> <span class="token builtin class-name">test</span> $<span class="token punctuation">[</span>num1<span class="token punctuation">]</span> -eq $<span class="token punctuation">[</span>num2<span class="token punctuation">]</span>
@@ -432,7 +432,7 @@ $			<span class="token comment">#检测是否为空，不空返回true		[$a]</sp
 <span class="token punctuation">..</span>.
 <span class="token keyword">fi</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h3 id="循环"><a href="#循环" class="headerlink" title="循环"></a>循环</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token keyword">for</span> <span class="token for-or-select variable">var</span> <span class="token keyword">in</span> item1 item2 <span class="token punctuation">..</span>. itemN
+<h3 id="循环"><a href="#循环" class="headerlink" title="循环"></a>循环</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token keyword">for</span> <span class="token for-or-select variable">var</span> <span class="token keyword">in</span> item1 item2 <span class="token punctuation">..</span>. itemN
 <span class="token keyword">do</span>
     command1
     command2
@@ -457,7 +457,7 @@ $			<span class="token comment">#检测是否为空，不空返回true		[$a]</sp
 
 <span class="token comment">#break 和 continue 都可以用</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token punctuation">[</span> <span class="token keyword">function</span> <span class="token punctuation">]</span> funname <span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
+<h3 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token punctuation">[</span> <span class="token keyword">function</span> <span class="token punctuation">]</span> funname <span class="token punctuation">[</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">]</span>
 <span class="token punctuation">&#123;</span>
     action<span class="token punctuation">;</span>
     <span class="token punctuation">[</span>return int<span class="token punctuation">;</span><span class="token punctuation">]</span>
@@ -522,12 +522,12 @@ funWithParam <span class="token number">1</span> <span class="token number">2</s
 </tbody></table>
 <p><em>需要注意的是文件描述符 0 通常是标准输入（STDIN），1 是标准输出（STDOUT），2 是标准错误输出（STDERR）。</em></p>
 <p>重定向还可以深入一点：</p>
-<pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">command</span> <span class="token operator"><span class="token file-descriptor important">2</span>></span>file <span class="token comment"># stderr 重定向到 file</span>
+<pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token builtin class-name">command</span> <span class="token operator"><span class="token file-descriptor important">2</span>></span>file <span class="token comment"># stderr 重定向到 file</span>
 <span class="token builtin class-name">command</span> <span class="token operator"><span class="token file-descriptor important">2</span>>></span>file	<span class="token comment">#stderr 追加到 file 文件末尾</span>
 <span class="token builtin class-name">command</span> <span class="token operator">></span> <span class="token function">file</span> <span class="token operator"><span class="token file-descriptor important">2</span>></span><span class="token file-descriptor important">&amp;1</span> 或 <span class="token builtin class-name">command</span> <span class="token operator">>></span> <span class="token function">file</span> <span class="token operator"><span class="token file-descriptor important">2</span>></span><span class="token file-descriptor important">&amp;1</span> <span class="token comment"># stdout 和 stderr 合并后重定向到 file</span>
 <span class="token builtin class-name">command</span> <span class="token operator">&lt;</span> file1 <span class="token operator">></span>file2 <span class="token comment">#command 命令将 stdin 重定向到 file1，将 stdout 重定向到 file2。</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
-<h3 id="Here-Document"><a href="#Here-Document" class="headerlink" title="Here Document"></a>Here Document</h3><pre class="line-numbers language-bash" data-language="bash"><code class="language-bash"><span class="token builtin class-name">command</span> <span class="token operator">&lt;&lt;</span> <span class="token string">delimiter
+<h3 id="Here-Document"><a href="#Here-Document" class="headerlink" title="Here Document"></a>Here Document</h3><pre class="line-numbers language-shell" data-language="shell"><code class="language-shell"><span class="token builtin class-name">command</span> <span class="token operator">&lt;&lt;</span> <span class="token string">delimiter
     document
 delimiter</span>
 <span class="token comment">#作用是将两个 delimiter 之间的内容(document) 作为输入传递给 command。</span>

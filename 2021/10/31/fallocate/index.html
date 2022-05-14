@@ -246,7 +246,7 @@ fallocate -x [-o offset] -l length filename<span aria-hidden="true" class="line-
 <p>操作完成后，将（offset+length）位置数据接到（offset）的位置，删掉原来这段长度的数据，文件的长度也会减少。</p>
 <p>该选项不能和<code>-n，--keep-size</code>一起使用</p>
 <h3 id="d-–dig-holes"><a href="#d-–dig-holes" class="headerlink" title="-d, –dig-holes"></a>-d, –dig-holes</h3><p>检测挖洞(<code>Detect and dig holes</code>)。</p>
-<p>让文件在位置当变得稀疏，但是不会是有额外的磁盘空间，最小的洞的大小取决于文件系统最小的I&#x2F;O块的大小，不过通常是4096字节。</p>
+<p>让文件在位置当变得稀疏，但是不会是有额外的磁盘空间，最小的洞的大小取决于文件系统最小的I/O块的大小，不过通常是4096字节。</p>
 <p>当使用这个选项的时候，<code>--keep-size</code>选项也是被隐含使用的，如果文件范围没有使用<code>-o</code>和<code>-l</code>进行指定了，然后分析整个文件的空洞。</p>
 <blockquote>
 <p>  You can think of this option as doing a “cp –sparse” and then renaming the destination file to the original, without the need for extra disk space.</p>
